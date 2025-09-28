@@ -55,7 +55,7 @@ namespace BeePM.Controllers
                 return View();
             }
 
-            user.PasswordHash = newPassword; // ileride hash yapılacak
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
             _db.SaveChanges();
 
             ViewBag.Message = "Parola başarıyla değiştirildi.";
@@ -92,6 +92,7 @@ namespace BeePM.Controllers
                 ModelState.AddModelError("", "Geçersiz şifre.");
                 return View();
             }
+
 
             // ✅ Claims oluştur
             var claims = new List<Claim>

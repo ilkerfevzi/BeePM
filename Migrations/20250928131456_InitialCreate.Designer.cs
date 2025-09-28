@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeePM.Migrations
 {
     [DbContext(typeof(BeePMDbContext))]
-    [Migration("20250928103344_InitialBaseline")]
-    partial class InitialBaseline
+    [Migration("20250928131456_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -194,36 +194,6 @@ namespace BeePM.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FullName = "User 1 Çalışan",
-                            Role = "Employee",
-                            Username = "employee1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            FullName = "User 2 Müdür",
-                            Role = "Manager",
-                            Username = "manager1"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            FullName = "User 3 Yönetim Kurulu",
-                            Role = "Board",
-                            Username = "board1"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            FullName = "Admin Kullanıcı",
-                            Role = "Admin",
-                            Username = "admin"
-                        });
                 });
 
             modelBuilder.Entity("BeePM.Models.ApprovalLog", b =>
