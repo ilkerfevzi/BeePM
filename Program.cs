@@ -1,14 +1,35 @@
-﻿using BeePM.Services;
-using Elsa.EntityFrameworkCore.Extensions;
+﻿using BeePM.Services; 
 using Elsa.EntityFrameworkCore.Modules.Management;
 using Elsa.EntityFrameworkCore.Modules.Runtime;
 using Elsa.EntityFrameworkCore.SqlServer;
 using Elsa.Extensions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using Elsa.Http;
+using Elsa.EntityFrameworkCore.Extensions; 
 
-var builder = WebApplication.CreateBuilder(args); 
+var builder = WebApplication.CreateBuilder(args);
+// Elsa runtime + HTTP aktiviteleri
+builder.Services.AddElsa(elsa =>
+{
+    elsa.AddWorkflowsFrom<Program>();
+
+    // Elsa HTTP
+    elsa.UseHttp(http => http.ConfigureHttpOptions = options =>
+    {
+        options.BaseUrl = new Uri("https://localhost:7192");
+        options.BasePath = "/workflows";
+    });
+
+    // Connection string
+    var cs = builder.Configuration.GetConnectionString("BeePM");
+
+    // Workflow Definition & Instance kalıcılığı (EF + SQL Server)
+    elsa.UseWorkflowManagement(m => m.UseEntityFrameworkCore(ef => ef.UseSqlServer(cs)));
+    elsa.UseWorkflowRuntime(r => r.UseEntityFrameworkCore(ef => ef.UseSqlServer(cs)));
+});
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
 builder.Services.AddSingleton<ApprovalLogService>();
 
@@ -24,32 +45,60 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Account/Login";
     });
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient("Elsa", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7192");
+});
 
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+// ✅ Elsa 3 endpointleri
+app.MapElsaWorkflows();
+
+app.MapRazorPages();
+app.MapControllers();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+builder.Services.AddSingleton<ApprovalLogService>();
+
+builder.Services.AddDbContext<BeePM.Models.BeePMDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("BeePM")));
+
+// Cookie Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/Login";
+    });
+ 
+
+
 
 app.UseAuthentication(); // <-- ekledik
 app.UseAuthorization();
 
 
-// Elsa runtime + HTTP aktiviteleri
-builder.Services.AddElsa(elsa =>
-{
-    elsa.AddWorkflowsFrom<Program>();
-    elsa.UseHttp(http => http.ConfigureHttpOptions = options =>
-    {
-        options.BaseUrl = new Uri("https://localhost:7192");
-        options.BasePath = "/workflows";
-    });
 
-    var cs = builder.Configuration.GetConnectionString("BeePM"); 
-    // Workflow Definition & Instance kalıcılığı (EF + SQL Server)
-    elsa.UseWorkflowManagement(m => m.UseEntityFrameworkCore(ef => ef.UseSqlServer(cs)));
-    elsa.UseWorkflowRuntime(r => r.UseEntityFrameworkCore(ef => ef.UseSqlServer(cs)));
-     
-
-}); 
 
 // Elsa için HttpClient
 builder.Services.AddHttpClient("Elsa", client =>
@@ -62,13 +111,7 @@ builder.Services.AddHttpClient("Elsa", client =>
 });
  
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
