@@ -13,7 +13,7 @@
 
 <hr />
 
-@if (Model.LastDecision.Contains("Kullanıcı1"))
+@if (string.IsNullOrEmpty(Model.LastDecision))
 {
     <form asp-action="Step1" method="post">
         <button name="decision" value="Onay" class="btn btn-success">✔ Kullanıcı1 Onay</button>
