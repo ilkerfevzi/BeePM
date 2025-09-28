@@ -76,30 +76,28 @@ namespace BeePM.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> Login(string username)
         {
-            var user = _db.Users.FirstOrDefault(u => u.Username == username && (u.PasswordHash == null || u.PasswordHash == password));
-
+            var user = _db.Users.FirstOrDefault(u => u.Username == username);
             if (user == null)
             {
-                ViewBag.Error = "Geçersiz kullanıcı adı veya parola.";
+                ModelState.AddModelError("", "Kullanıcı bulunamadı.");
                 return View();
             }
 
-            var claims = new List<System.Security.Claims.Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim("FullName", user.FullName),
-                new Claim("Role", user.Role)
-            };
+            var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim("FullName", user.FullName),
+            new Claim("Role", user.Role)
+        };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
+
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            return RedirectToAction("Index", "Home");
-
-
+            return RedirectToAction("Index", "Approval");
         }
 
     }
