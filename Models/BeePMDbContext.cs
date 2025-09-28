@@ -11,6 +11,7 @@ namespace BeePM.Models
 
         public DbSet<User> Users { get; set; }
         public DbSet<ApprovalLog> ApprovalLogs { get; set; }
+        public DbSet<ApprovalRequest> ApprovalRequests { get; set; } = null!;  // ✅ eklendi
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,5 +24,6 @@ namespace BeePM.Models
 
             base.OnModelCreating(modelBuilder);
         }
+
     }
 }

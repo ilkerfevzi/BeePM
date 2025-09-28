@@ -87,5 +87,54 @@ namespace BeePM.Controllers
             TempData["msg"] = "Log temizlendi.";
             return RedirectToAction(nameof(Index));
         }
+        [HttpPost]
+        public IActionResult CreateRequest(ApprovalRequest request)
+        {
+            var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
+            request.CreatedBy = currentUser.Id;
+            request.Status = "Pending";
+            _db.ApprovalRequests.Add(request);
+            _db.SaveChanges();
+
+            TempData["msg"] = "Yeni onay süreci başlatıldı.";
+            return RedirectToAction("Index");
+        }
+        public IActionResult PendingRequests()
+        {
+            var requests = _db.ApprovalRequests
+                .Where(r => r.Status == "Pending")
+                .OrderBy(r => r.CreatedAt)
+                .ToList();
+
+            return View(requests);
+        }
+        [HttpPost]
+        public IActionResult Decide(int requestId, string decision)
+        {
+            var req = _db.ApprovalRequests.Find(requestId);
+            if (req == null) return NotFound();
+
+            req.Status = decision == "Onay" ? "Approved" : "Rejected";
+            _db.SaveChanges();
+
+            _db.ApprovalLogs.Add(new ApprovalLog
+            {
+                Timestamp = DateTime.Now,
+                Message = $"User2 kararı: {decision}",
+                UserId = 2 // şimdilik hardcoded
+            });
+            _db.SaveChanges();
+
+            return RedirectToAction("PendingRequests");
+        }
+        public IActionResult MyRequests()
+{
+    var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
+    var myReqs = _db.ApprovalRequests
+        .Where(r => r.CreatedBy == currentUser.Id)
+        .ToList();
+    return View(myReqs);
+}
+
     }
 }
