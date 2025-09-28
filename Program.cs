@@ -64,6 +64,10 @@ builder.Services.AddHttpClient("Elsa", client =>
 
 var app = builder.Build();
 
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Account}/{action=Login}/{id?}");
+
 app.UseAuthentication(); // <-- ekledik
 app.UseAuthorization();  
 app.UseHttpsRedirection();
@@ -78,9 +82,6 @@ if (!app.Environment.IsDevelopment())
 }
 app.MapRazorPages();
 // ✅ Elsa 3 için doğru olan:
-app.UseWorkflows();
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseWorkflows(); 
 app.MapControllers();
 app.Run();

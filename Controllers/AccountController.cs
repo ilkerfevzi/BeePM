@@ -5,68 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-
-//namespace BeePM.Controllers
-//{
-//    public class AccountController : Controller
-//    {
-//        private readonly BeePMDbContext _db;
-
-//        public AccountController(BeePMDbContext db)
-//        {
-//            _db = db;
-//        }
-
-//        [HttpGet]
-//        public IActionResult Login()
-//        {
-//            return View();
-//        }
-
-//        [HttpPost]
-//        public async Task<IActionResult> Login(string username, string password)
-//        {
-//            // Şifreyi SHA256 hash’le
-//            using var sha = SHA256.Create();
-//            var hash = BitConverter.ToString(
-//                sha.ComputeHash(Encoding.UTF8.GetBytes(password))
-//            ).Replace("-", "").ToLower();
-
-//            // Kullanıcıyı DB’den kontrol et
-//            var user = _db.Users.FirstOrDefault(u =>
-//                u.Username == username && u.PasswordHash == hash);
-
-//            if (user == null)
-//            {
-//                ViewBag.Error = "Kullanıcı adı veya şifre hatalı!";
-//                return View();
-//            }
-
-//            // Claims oluştur
-//            var claims = new List<Claim>
-//            {
-//                new Claim(ClaimTypes.Name, user.Username),
-//                new Claim("FullName", user.FullName),
-//                new Claim(ClaimTypes.Role, user.Role) // Örn: Employee, Manager, Board, Admin
-//            };
-
-//            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-//            var principal = new ClaimsPrincipal(identity);
-
-//            // Cookie oluştur
-//            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-//            return RedirectToAction("Index", "Home");
-//        }
-
-//        [HttpGet]
-//        public async Task<IActionResult> Logout()
-//        {
-//            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-//            return RedirectToAction("Login");
-//        }
-//    }
-//}
+ 
 
 namespace BeePM.Controllers
 {
@@ -123,14 +62,12 @@ namespace BeePM.Controllers
             return View();
         }
 
-        // ✅ Çıkış
-        [HttpPost]
+        // ✅ Çıkış 
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync();
             return RedirectToAction("Login");
         }
-
         // ✅ Giriş (şimdilik basit)
         [HttpGet]
         public IActionResult Login()
@@ -151,17 +88,19 @@ namespace BeePM.Controllers
 
             var claims = new List<System.Security.Claims.Claim>
             {
-                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, user.Username),
-                new System.Security.Claims.Claim("FullName", user.FullName),
-                new System.Security.Claims.Claim("Role", user.Role ?? "Guest")
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim("FullName", user.FullName),
+                new Claim("Role", user.Role)
             };
 
-            var identity = new System.Security.Claims.ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new System.Security.Claims.ClaimsPrincipal(identity);
-
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
             return RedirectToAction("Index", "Home");
+
+
         }
+
     }
 }

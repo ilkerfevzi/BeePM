@@ -34,50 +34,34 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="/">BeePM</a>
         <div class="collapse navbar-collapse">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="/Approval/CreateRequest">Yeni Talep</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/Approval/MyRequests">Benim Taleplerim</a>
-                </li>
-
-                @if (role == "Manager" || role == "Admin")
-                {
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Approval/PendingRequests">Onayımdaki Talepler</a>
-                    </li>
-                }
-                @if (role == "Admin")
-                {
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Approval/Logs">Approval Logs</a>
-                    </li>
-                }
-            </ul>
-
-            <!-- ✅ Sağ üst kullanıcı dropdown -->
             @if (isAuthenticated)
             {
-                <div class="dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        @fullName <span class="@badgeClass">@role</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="/Account/Profile">Profilim</a></li>
-                        <li><a class="dropdown-item" href="/Account/ChangePassword">Parola Değiştir</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form method="post" asp-controller="Account" asp-action="Logout">
-                                <button class="dropdown-item">Çıkış Yap</button>
-                            </form>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Approval/CreateRequest">Yeni Talep</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Approval/MyRequests">Benim Taleplerim</a>
+                    </li>
+                    @if (role == "Manager" || role == "Admin")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Approval/PendingRequests">Onayımdaki Talepler</a>
                         </li>
-                    </ul>
-                </div>
+                    }
+                    @if (role == "Admin")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Approval/Logs">Approval Logs</a>
+                        </li>
+                    }
+                </ul>
+                <span class="@badgeClass">@fullName (@role)</span>
+                <a href="/Account/Logout" class="btn btn-outline-light ms-2">Çıkış</a>
             }
             else
             {
-                <a class="btn btn-outline-light" href="/Account/Login">Giriş Yap</a>
+                <a href="/Account/Login" class="btn btn-outline-light">Giriş Yap</a>
             }
         </div>
     </nav>
