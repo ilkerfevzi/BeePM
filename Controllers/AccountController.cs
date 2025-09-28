@@ -76,21 +76,22 @@ namespace BeePM.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string username)
+        public async Task<IActionResult> Login(string username, string password)
         {
             var user = _db.Users.FirstOrDefault(u => u.Username == username);
-            if (user == null)
+
+            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
-                ModelState.AddModelError("", "Kullanıcı bulunamadı.");
+                ModelState.AddModelError("", "Kullanıcı adı veya şifre hatalı.");
                 return View();
             }
 
             var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim("FullName", user.FullName),
-            new Claim("Role", user.Role)
-        };
+    {
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim("FullName", user.FullName),
+        new Claim("Role", user.Role)
+    };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
@@ -99,6 +100,8 @@ namespace BeePM.Controllers
 
             return RedirectToAction("Index", "Approval");
         }
+
+
 
     }
 }
