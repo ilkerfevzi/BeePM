@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Onay Ekranı";
+}
+
+<h2>Onay Süreci</h2>
+
+<div class="alert alert-info">
+    @if (TempData["msg"] != null)
+    {
+        <strong>Durum:</strong> 
+        @TempData["msg"]
+    }
+</div>
+
+<h4>Geçmiş Log</h4>
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>Tarih</th>
+            <th>Kullanıcı</th>
+            <th>Mesaj</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model)
+        {
+            <tr>
+                <td>@log.Timestamp.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@log.User?.FullName ?? "-"</td>
+                <td>@log.Message</td>
+            </tr>
+        }
+    </tbody>
+</table>

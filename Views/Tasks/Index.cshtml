@@ -1,0 +1,39 @@
+﻿@* @model List<BeePM.Models.ApprovalLog>
+ 
+ @model List<(DateTime Timestamp, string Message)>*@
+ @model IEnumerable<BeePM.Models.ApprovalLog>
+
+<h2>Approval Workflow Test</h2>
+
+<form asp-action="Start" method="post" style="margin-bottom:10px;">
+    <button type="submit" class="btn btn-secondary">▶ Workflow Başlat</button>
+</form>
+
+<form asp-action="Approve" method="post" style="margin-right:10px; display:inline-block;">
+    <button type="submit" class="btn btn-success">✅ Onayla</button>
+</form>
+
+<form asp-action="Reject" method="post" style="display:inline-block;">
+    <button type="submit" class="btn btn-danger">❌ Reddet</button>
+</form>
+
+<hr />
+
+<h4>📜 Workflow Log</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Tarih</th>
+            <th>Mesaj</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model)
+        {
+            <tr>
+                <td>@log.Timestamp.ToString("HH:mm:ss")</td>
+                <td>@log.Message</td>
+            </tr>
+        }
+    </tbody>
+</table>
