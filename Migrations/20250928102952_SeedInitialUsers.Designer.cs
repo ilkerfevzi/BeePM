@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeePM.Migrations
 {
     [DbContext(typeof(BeePMDbContext))]
-    [Migration("20250928101755_SeedUsers")]
-    partial class SeedUsers
+    [Migration("20250928102952_SeedInitialUsers")]
+    partial class SeedInitialUsers
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

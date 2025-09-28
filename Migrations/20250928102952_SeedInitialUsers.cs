@@ -7,36 +7,21 @@
 namespace BeePM.Migrations
 {
     /// <inheritdoc />
-    public partial class SeedUsers : Migration
+    public partial class SeedInitialUsers : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "FieldDefinitions",
-                keyColumn: "Id",
-                keyValue: 1);
-
-            migrationBuilder.DeleteData(
-                table: "FieldDefinitions",
-                keyColumn: "Id",
-                keyValue: 2);
-
-            migrationBuilder.DeleteData(
-                table: "FieldDefinitions",
-                keyColumn: "Id",
-                keyValue: 3);
-
             migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "Id", "FullName", "PasswordHash", "Role", "Username" },
-                values: new object[,]
-                {
-                    { 1, "User 1 Çalışan", null, "Employee", "employee1" },
-                    { 2, "User 2 Müdür", null, "Manager", "manager1" },
-                    { 3, "User 3 Yönetim Kurulu", null, "Board", "board1" },
-                    { 4, "Admin Kullanıcı", null, "Admin", "admin" }
-                });
+         table: "Users",
+         columns: new[] { "Id", "Username", "FullName", "Role" },
+         values: new object[,]
+         {
+            { 1, "employee1", "User 1 Çalışan", "Employee" },
+            { 2, "manager1", "User 2 Müdür", "Manager" },
+            { 3, "board1", "User 3 Yönetim Kurulu", "Board" },
+            { 4, "admin", "Admin Kullanıcı", "Admin" }
+         });
         }
 
         /// <inheritdoc />
