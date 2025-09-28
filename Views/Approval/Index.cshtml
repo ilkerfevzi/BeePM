@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BeePM.Models.ApprovalLog>
+﻿@model BeePM.Models.ApprovalViewModel
 
 <h2>Onay Süreci</h2>
 
@@ -13,17 +13,21 @@
 
 <hr />
 
-<form asp-action="Step1" method="post">
-    <button name="decision" value="Onay" class="btn btn-success">✔ Kullanıcı1 Onay</button>
-    <button name="decision" value="Red" class="btn btn-danger">✘ Kullanıcı1 Red</button>
-</form>
+@if (Model.LastDecision.Contains("Kullanıcı1"))
+{
+    <form asp-action="Step1" method="post">
+        <button name="decision" value="Onay" class="btn btn-success">✔ Kullanıcı1 Onay</button>
+        <button name="decision" value="Red" class="btn btn-danger">✘ Kullanıcı1 Red</button>
+    </form>
+}
 
-<hr />
-
-<form asp-action="Step2" method="post">
-    <button name="decision" value="Onay" class="btn btn-success">✔ Kullanıcı2 Onay</button>
-    <button name="decision" value="Red" class="btn btn-danger">✘ Kullanıcı2 Red</button>
-</form>
+@if (Model.LastDecision.Contains("Kullanıcı1 kararı: Onay"))
+{
+    <form asp-action="Step2" method="post">
+        <button name="decision" value="Onay" class="btn btn-success">✔ Kullanıcı2 Onay</button>
+        <button name="decision" value="Red" class="btn btn-danger">✘ Kullanıcı2 Red</button>
+    </form>
+}
 
 <hr />
 
@@ -36,7 +40,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var log in Model)
+        @foreach (var log in Model.Logs)
         {
             <tr>
                 <td>@log.Timestamp.ToString("dd.MM.yyyy HH:mm")</td>
