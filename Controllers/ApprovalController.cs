@@ -44,14 +44,8 @@ namespace BeePM.Controllers
             await http.PostAsync("/workflows/approval/start",
                 new StringContent("", Encoding.UTF8, "text/plain"));
 
-            _db.ApprovalLogs.Add(new ApprovalLog
-            {
-                Timestamp = DateTime.Now,
-                Message = "Workflow başlatıldı",
-                UserId = 1 // 👈 geçici admin id
-            });
+            _db.ApprovalLogs.Add(new ApprovalLog { Timestamp = DateTime.Now, Message = "Workflow başlatıldı", UserId = 1 });
             _db.SaveChanges();
-
             TempData["msg"] = "Workflow başlatıldı";
             return RedirectToAction(nameof(Index));
         }
@@ -63,14 +57,8 @@ namespace BeePM.Controllers
             await http.PostAsync("/workflows/approval/step1",
                 new StringContent(decision, Encoding.UTF8, "text/plain"));
 
-            _db.ApprovalLogs.Add(new ApprovalLog
-            {
-                Timestamp = DateTime.Now,
-                Message = $"Kullanıcı1 kararı: {decision}",
-                UserId = 1
-            });
+            _db.ApprovalLogs.Add(new ApprovalLog { Timestamp = DateTime.Now, Message = $"Kullanıcı1 kararı: {decision}", UserId = 1 });
             _db.SaveChanges();
-
             TempData["msg"] = $"Step1 → {decision}";
             return RedirectToAction(nameof(Index));
         }
@@ -82,15 +70,17 @@ namespace BeePM.Controllers
             await http.PostAsync("/workflows/approval/step2",
                 new StringContent(decision, Encoding.UTF8, "text/plain"));
 
-            _db.ApprovalLogs.Add(new ApprovalLog
-            {
-                Timestamp = DateTime.Now,
-                Message = $"Kullanıcı2 kararı: {decision}",
-                UserId = 1
-            });
+            _db.ApprovalLogs.Add(new ApprovalLog { Timestamp = DateTime.Now, Message = $"Kullanıcı2 kararı: {decision}", UserId = 1 });
             _db.SaveChanges();
-
             TempData["msg"] = $"Step2 → {decision}";
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpPost("reset")]
+        public IActionResult Reset()
+        {
+            _db.ApprovalLogs.RemoveRange(_db.ApprovalLogs);
+            _db.SaveChanges();
+            TempData["msg"] = "Log temizlendi.";
             return RedirectToAction(nameof(Index));
         }
     }

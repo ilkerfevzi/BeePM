@@ -2,35 +2,37 @@
 
 <h2>Onay Süreci</h2>
 
-@if (TempData["msg"] != null)
+@if (TempData["msg"] is string info)
 {
-    <div class="alert alert-info">@TempData["msg"]</div>
+    <div class="alert alert-info">@info</div>
 }
 
-<form asp-action="Start" method="post">
-    <button class="btn btn-primary">▶ Workflow Başlat</button>
+<form asp-action="Start" method="post" class="mb-3">
+    <button class="btn btn-primary">
+        ▶ Workflow Başlat
+    </button>
 </form>
 
-<hr />
-
-@if (string.IsNullOrEmpty(Model.LastDecision))
+@if (Model.ShowStep1)
 {
-    <form asp-action="Step1" method="post">
-        <button name="decision" value="Onay" class="btn btn-success">✔ Kullanıcı1 Onay</button>
+    <form asp-action="Step1" method="post" class="mb-3">
+        <button name="decision" value="Onay" class="btn btn-success me-2">✔ Kullanıcı1 Onay</button>
         <button name="decision" value="Red" class="btn btn-danger">✘ Kullanıcı1 Red</button>
     </form>
 }
 
-@if (Model.LastDecision.Contains("Kullanıcı1 kararı: Onay"))
+@if (Model.ShowStep2)
 {
-    <form asp-action="Step2" method="post">
-        <button name="decision" value="Onay" class="btn btn-success">✔ Kullanıcı2 Onay</button>
+    <form asp-action="Step2" method="post" class="mb-3">
+        <button name="decision" value="Onay" class="btn btn-success me-2">✔ Kullanıcı2 Onay</button>
         <button name="decision" value="Red" class="btn btn-danger">✘ Kullanıcı2 Red</button>
     </form>
 }
+<form asp-action="Reset" method="post" class="mb-3">
+    <button class="btn btn-outline-secondary">↺ Reset</button>
+</form>
 
 <hr />
-
 <h4>Geçmiş Log</h4>
 <table class="table table-striped">
     <thead>
