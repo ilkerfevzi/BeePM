@@ -20,20 +20,24 @@ namespace BeePM.Controllers
         public IActionResult Index()
         {
             var logs = _db.ApprovalLogs
-                          .OrderByDescending(x => x.Timestamp)
-                          .Take(50)
-                          .ToList();
+              .OrderByDescending(x => x.Timestamp)
+              .Take(50)
+              .ToList();
 
-            // Son karar
-            string lastDecision = logs.FirstOrDefault()?.Message ?? "";
-
-            var model = new ApprovalViewModel
+            var last = logs.FirstOrDefault()?.Message ?? "";
+            string status = last switch
             {
-                Logs = logs,
-                LastDecision = lastDecision
+                "" => "Idle",
+                "Workflow başlatıldı" => "WaitingStep1",
+                "Kullanıcı1 kararı: Onay" => "WaitingStep2",
+                "Kullanıcı1 kararı: Red" => "Rejected",
+                _ when last.StartsWith("Kullanıcı2 kararı:") => "Done",
+                _ => "Idle"
             };
 
+            var model = new ApprovalViewModel { Logs = logs, Status = status };
             return View(model);
+
         }
 
 

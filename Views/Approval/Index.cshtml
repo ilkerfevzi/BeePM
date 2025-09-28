@@ -1,5 +1,6 @@
 ﻿@model BeePM.Models.ApprovalViewModel
-
+@if (Model.ShowStep1) { /* Step1 butonları */ }
+@if (Model.ShowStep2) { /* Step2 butonları */ }
 <h2>Onay Süreci</h2>
 
 @if (TempData["msg"] is string info)
