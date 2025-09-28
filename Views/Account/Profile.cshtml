@@ -1,0 +1,21 @@
+﻿@model BeePM.Models.User
+@{
+    ViewBag.Title = "Profilim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Profilim</h2>
+<table class="table table-bordered">
+    <tr>
+        <th>Kullanıcı Adı</th>
+        <td>@Model.Username</td>
+    </tr>
+    <tr>
+        <th>Ad Soyad</th>
+        <td>@Model.FullName</td>
+    </tr>
+    <tr>
+        <th>Rol</th>
+        <td><span class="badge bg-info">@Model.Role</span></td>
+    </tr>
+</table>
