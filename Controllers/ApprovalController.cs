@@ -63,8 +63,18 @@ namespace BeePM.Controllers
             var model = new PendingRequestsViewModel { Requests = requests };
             return View(model);
         }
-         
-         
+
+        [HttpGet("history")]
+        public IActionResult History()
+        {
+            var logs = _db.ApprovalLogs
+                .OrderByDescending(x => x.Timestamp)
+                .Take(200) // en fazla 200 kayıt
+                .ToList();
+
+            return View(logs);
+        }
+
         [HttpGet("details/{id}")]
         public IActionResult Details(int id)
         {

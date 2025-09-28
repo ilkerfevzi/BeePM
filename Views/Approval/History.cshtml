@@ -1,0 +1,27 @@
+﻿@model IEnumerable<BeePM.Models.ApprovalLog>
+
+@{
+    ViewBag.Title = "Geçmiş Süreçler";
+}
+
+<h2>📜 Geçmiş Süreçler</h2>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Tarih</th>
+            <th>Kullanıcı</th>
+            <th>Mesaj</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model)
+        {
+            <tr>
+                <td>@log.Timestamp.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@log.UserId</td>
+                <td>@log.Message</td>
+            </tr>
+        }
+    </tbody>
+</table>
