@@ -63,43 +63,8 @@ namespace BeePM.Controllers
             var model = new PendingRequestsViewModel { Requests = requests };
             return View(model);
         }
-
-        [HttpGet("create")]
-        public IActionResult Create()
-        {
-            var fields = _db.FieldDefinitions.ToList();
-            return View(fields);
-        }
-        [HttpPost("create")]
-        public IActionResult Create(string Title, Dictionary<string, string> formData)
-        {
-            var user = _db.Users.First(); // şimdilik dummy user
-            var request = new ApprovalRequest
-            {
-                Title = Title,
-                CreatedBy = user.Id,
-                Status = "Pending"
-            };
-            _db.ApprovalRequests.Add(request);
-            _db.SaveChanges();
-
-            foreach (var field in _db.FieldDefinitions.ToList())
-            {
-                if (formData.TryGetValue($"field_{field.Id}", out var val))
-                {
-                    _db.ApprovalRequestFields.Add(new ApprovalRequestField
-                    {
-                        RequestId = request.Id,
-                        FieldDefinitionId = field.Id,
-                        Value = val
-                    });
-                }
-            }
-            _db.SaveChanges();
-
-            TempData["msg"] = "Talep başarıyla oluşturuldu.";
-            return RedirectToAction("PendingRequests");
-        }
+         
+         
         [HttpGet("details/{id}")]
         public IActionResult Details(int id)
         {
@@ -167,19 +132,27 @@ namespace BeePM.Controllers
             TempData["msg"] = "Log temizlendi.";
             return RedirectToAction(nameof(Index));
         }
-        [HttpPost]
+        [HttpGet("create")]
+        public IActionResult Create()
+        {
+            return View(new ApprovalRequest());
+        }
+        [HttpPost("create")]
         public IActionResult CreateRequest(ApprovalRequest request)
         {
             var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
             request.CreatedBy = currentUser.Id;
             request.Status = "Pending";
+            request.CreatedAt = DateTime.Now;
+
             _db.ApprovalRequests.Add(request);
             _db.SaveChanges();
 
             TempData["msg"] = "Yeni onay süreci başlatıldı.";
-            return RedirectToAction("Index");
+            return RedirectToAction("PendingRequests");
         }
-         
+
+
         [HttpPost]
         public IActionResult Decide(int requestId, string decision)
         {

@@ -10,10 +10,9 @@ namespace BeePM.Models
 
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<ApprovalLog> ApprovalLogs { get; set; } = null!;
-        public DbSet<ApprovalRequest> ApprovalRequests { get; set; } = null!;
-        public DbSet<FieldDefinition> FieldDefinitions { get; set; } = null!;
-        public DbSet<ApprovalRequestField> ApprovalRequestFields { get; set; } = null!;
-
+        public DbSet<ApprovalRequest> ApprovalRequests { get; set; }
+        public DbSet<FieldDefinition> FieldDefinitions { get; set; }
+        public DbSet<ApprovalRequestField> ApprovalRequestFields { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

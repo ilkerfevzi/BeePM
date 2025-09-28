@@ -1,27 +1,31 @@
-﻿@model BeePM.Models.PendingRequestsViewModel
+﻿@model IEnumerable<BeePM.Models.ApprovalRequest>
 
-<h2>Onayımdaki Süreçler</h2>
+<h2>Onayımda Olan Talepler</h2>
 
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Başlık</th>
+            <th>Talep Nedeni</th>
+            <th>Talep Edilen</th>
             <th>Durum</th>
-            <th>Oluşturan</th>
-            <th>Tarih</th>
-            <th></th>
+            <th>Aksiyon</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var req in Model.Requests)
+        @foreach (var req in Model)
         {
             <tr>
                 <td>@req.Title</td>
+                <td>@req.Reason</td>
+                <td>@req.RequestedItem</td>
                 <td>@req.Status</td>
-                <td>@req.CreatedBy</td>
-                <td>@req.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@req.Id" class="btn btn-sm btn-primary">İncele</a>
+                    <form asp-action="Decide" method="post" style="display:inline;">
+                        <input type="hidden" name="requestId" value="@req.Id" />
+                        <button type="submit" name="decision" value="Onay" class="btn btn-success">Onayla</button>
+                        <button type="submit" name="decision" value="Red" class="btn btn-danger">Reddet</button>
+                    </form>
                 </td>
             </tr>
         }

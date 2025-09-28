@@ -1,17 +1,22 @@
-﻿@model List<BeePM.Models.FieldDefinition>
+﻿@model BeePM.Models.ApprovalRequest
 
-<h2>Yeni Talep Başlat</h2>
-<form asp-action="Create" method="post">
+<h2>Yeni Onay Talebi</h2>
 
-    <div class="mb-3">
+<form asp-action="CreateRequest" method="post">
+    <div class="form-group">
         <label>Başlık</label>
-        <input type="text" name="Title" class="form-control" required />
+        <input asp-for="Title" class="form-control" />
     </div>
 
-    @foreach (var field in Model)
-    {
-        @Html.Partial("_RenderField", field)
-    }
+    <div class="form-group">
+        <label>Talep Nedeni</label>
+        <textarea asp-for="Reason" class="form-control"></textarea>
+    </div>
 
-    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <div class="form-group">
+        <label>Talep Edilen</label>
+        <input asp-for="RequestedItem" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Gönder</button>
 </form>
