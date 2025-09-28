@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using System.Security.Claims; 
 using System.Security.Cryptography;
 using System.Text;
 using BCrypt.Net;
@@ -60,15 +60,8 @@ namespace BeePM.Controllers
 
             ViewBag.Message = "Parola başarıyla değiştirildi.";
             return View();
-        }
-
-        // ✅ Çıkış 
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync();
-            return RedirectToAction("Login");
-        }
-        // ✅ Giriş (şimdilik basit)
+        } 
+         
         [HttpGet]
         public IActionResult Login()
         {
@@ -78,8 +71,14 @@ namespace BeePM.Controllers
 
 
         [HttpPost]
-        public IActionResult Login(string username, string password)
+        public async Task<IActionResult> Login(string username, string password)
         {
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                ModelState.AddModelError("", "Kullanıcı adı ve şifre girilmelidir.");
+                return View();
+            }
+
             var user = _db.Users.FirstOrDefault(u => u.Username == username);
             if (user == null)
             {
@@ -87,30 +86,35 @@ namespace BeePM.Controllers
                 return View();
             }
 
-            // ✅ BCrypt ile şifre doğrula
-            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            // ✅ Şifre doğrulama (NULL check ile)
+            if (string.IsNullOrEmpty(user.PasswordHash) || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
                 ModelState.AddModelError("", "Geçersiz şifre.");
                 return View();
             }
 
-            // Login başarılı
+            // ✅ Claims oluştur
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, user.Username),
-        new Claim("FullName", user.FullName),
-        new Claim(ClaimTypes.Role, user.Role)
-    };
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim("FullName", user.FullName),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
-            HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
             return RedirectToAction("Index", "Home");
         }
 
-
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Account");
+        }
 
 
     }

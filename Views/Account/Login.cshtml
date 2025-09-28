@@ -1,11 +1,32 @@
-﻿@model dynamic
-<div class="container mt-5">
-    <h2>Giriş Yap</h2>
-    <form method="post">
-        <div class="mb-3">
-            <label class="form-label">Kullanıcı Adı</label>
-            <input type="text" name="username" class="form-control" required />
-        </div>
-        <button type="submit" class="btn btn-primary">Giriş</button>
-    </form>
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <h3 class="text-center">BeePM Giriş</h3>
+        <form asp-action="Login" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">Kullanıcı Adı</label>
+                <input type="text" class="form-control" id="username" name="username" required />
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Şifre</label>
+                <input type="password" class="form-control" id="password" name="password" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Giriş Yap</button>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger mt-3">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <div>@error.ErrorMessage</div>
+                    }
+                </div>
+            }
+        </form>
+    </div>
 </div>
