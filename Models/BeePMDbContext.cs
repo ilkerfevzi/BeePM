@@ -22,14 +22,14 @@ namespace BeePM.Models
                 new FieldDefinition
                 {
                     Id = 1,
-                    Name = "Reason",
+                    //Name = "Reason",
                     Label = "Talep Nedeni",
                     FieldType = "Textbox"
                 },
                 new FieldDefinition
                 {
                     Id = 2,
-                    Name = "Item",
+                    //Name = "Item",
                     Label = "Talep Edilen Ürün",
                     FieldType = "Combobox",
                     Options = "[\"Laptop\",\"Telefon\",\"Tablet\"]"
@@ -37,7 +37,7 @@ namespace BeePM.Models
                 new FieldDefinition
                 {
                     Id = 3,
-                    Name = "Quantity",
+                    //Name = "Quantity",
                     Label = "Adet",
                     FieldType = "Numeric"
                 }
