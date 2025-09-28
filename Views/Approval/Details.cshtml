@@ -1,0 +1,40 @@
+﻿@model BeePM.Models.RequestDetailsViewModel
+
+<h2>Süreç Detayı</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h4>@Model.Request.Title</h4>
+        <p>@Model.Request.Description</p>
+        <p><b>Durum:</b> @Model.Request.Status</p>
+        <p><b>Oluşturan:</b> @Model.Request.CreatedBy</p>
+        <p><b>Tarih:</b> @Model.Request.CreatedAt</p>
+    </div>
+</div>
+
+<h3>Geçmiş Log</h3>
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>Tarih</th>
+            <th>Mesaj</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.Logs)
+        {
+            <tr>
+                <td>@log.Timestamp.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@log.Message</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <form method="post" asp-action="Decide" asp-route-requestId="@Model.Request.Id">
+        <button type="submit" name="decision" value="Onay" class="btn btn-success">Onayla</button>
+        <button type="submit" name="decision" value="Red" class="btn btn-danger">Reddet</button>
+    </form>
+}

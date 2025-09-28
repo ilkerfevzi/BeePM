@@ -39,6 +39,86 @@ namespace BeePM.Controllers
             return View(model);
 
         }
+        // Benim süreçlerim
+        public IActionResult MyRequests()
+        {
+            var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
+            var myReqs = _db.ApprovalRequests
+                .Where(r => r.CreatedBy == currentUser.Id)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToList();
+
+            var model = new MyRequestsViewModel { Requests = myReqs };
+            return View(model);
+        }
+
+        // Onayımdaki süreçler
+        public IActionResult PendingRequests()
+        {
+            var requests = _db.ApprovalRequests
+                .Where(r => r.Status == "Pending")
+                .OrderBy(r => r.CreatedAt)
+                .ToList();
+
+            var model = new PendingRequestsViewModel { Requests = requests };
+            return View(model);
+        }
+
+        [HttpGet("create")]
+        public IActionResult Create()
+        {
+            var fields = _db.FieldDefinitions.ToList();
+            return View(fields);
+        }
+        [HttpPost("create")]
+        public IActionResult Create(string Title, Dictionary<string, string> formData)
+        {
+            var user = _db.Users.First(); // şimdilik dummy user
+            var request = new ApprovalRequest
+            {
+                Title = Title,
+                CreatedBy = user.Id,
+                Status = "Pending"
+            };
+            _db.ApprovalRequests.Add(request);
+            _db.SaveChanges();
+
+            foreach (var field in _db.FieldDefinitions.ToList())
+            {
+                if (formData.TryGetValue($"field_{field.Id}", out var val))
+                {
+                    _db.ApprovalRequestFields.Add(new ApprovalRequestField
+                    {
+                        RequestId = request.Id,
+                        FieldDefinitionId = field.Id,
+                        Value = val
+                    });
+                }
+            }
+            _db.SaveChanges();
+
+            TempData["msg"] = "Talep başarıyla oluşturuldu.";
+            return RedirectToAction("PendingRequests");
+        }
+        [HttpGet("details/{id}")]
+        public IActionResult Details(int id)
+        {
+            var req = _db.ApprovalRequests.Find(id);
+            if (req == null) return NotFound();
+
+            var logs = _db.ApprovalLogs.Where(l => l.UserId == req.CreatedBy || l.Message.Contains($"Request {id}"))
+                                       .OrderByDescending(l => l.Timestamp)
+                                       .ToList();
+
+            var model = new RequestDetailsViewModel
+            {
+                Request = req,
+                Logs = logs
+            };
+
+            return View(model);
+        }
+
 
 
         [HttpPost("start")]
@@ -99,15 +179,7 @@ namespace BeePM.Controllers
             TempData["msg"] = "Yeni onay süreci başlatıldı.";
             return RedirectToAction("Index");
         }
-        public IActionResult PendingRequests()
-        {
-            var requests = _db.ApprovalRequests
-                .Where(r => r.Status == "Pending")
-                .OrderBy(r => r.CreatedAt)
-                .ToList();
-
-            return View(requests);
-        }
+         
         [HttpPost]
         public IActionResult Decide(int requestId, string decision)
         {
@@ -127,14 +199,18 @@ namespace BeePM.Controllers
 
             return RedirectToAction("PendingRequests");
         }
-        public IActionResult MyRequests()
-{
-    var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
-    var myReqs = _db.ApprovalRequests
-        .Where(r => r.CreatedBy == currentUser.Id)
-        .ToList();
-    return View(myReqs);
-}
+        // Geçmiş süreçler
+        public IActionResult CompletedRequests()
+        {
+            var requests = _db.ApprovalRequests
+                .Where(r => r.Status == "Approved" || r.Status == "Rejected")
+                .OrderByDescending(r => r.CreatedAt)
+                .ToList();
+
+            var model = new CompletedRequestsViewModel { Requests = requests };
+            return View(model);
+        }
+
 
     }
 }

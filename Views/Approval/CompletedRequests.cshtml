@@ -1,0 +1,34 @@
+﻿@model BeePM.Models.CompletedRequestsViewModel
+
+<h2>Geçmiş Süreçler</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Başlık</th>
+            <th>Durum</th>
+            <th>Oluşturan</th>
+            <th>Başlangıç Tarihi</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var req in Model.Requests)
+        {
+            <tr>
+                <td>@req.Title</td>
+                <td>
+                    @if (req.Status == "Approved")
+                    {
+                        <span class="badge bg-success">Onaylandı</span>
+                    }
+                    else if (req.Status == "Rejected")
+                    {
+                        <span class="badge bg-danger">Reddedildi</span>
+                    }
+                </td>
+                <td>@req.CreatedBy</td>
+                <td>@req.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+            </tr>
+        }
+    </tbody>
+</table>

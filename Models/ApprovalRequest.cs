@@ -3,13 +3,11 @@
     public class ApprovalRequest
     {
         public int Id { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string? Description { get; set; }
-        public int CreatedBy { get; set; }
+        public string Title { get; set; } = "";
         public string Status { get; set; } = "Pending";
+        public int CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // Navigation
-        public User? User { get; set; }
+        public ICollection<ApprovalRequestField> Fields { get; set; } = new List<ApprovalRequestField>();
     }
 }

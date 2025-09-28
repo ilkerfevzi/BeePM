@@ -1,11 +1,11 @@
 ﻿@model List<BeePM.Models.FieldDefinition>
 
 <h2>Yeni Talep Başlat</h2>
-<form asp-action="CreateRequest" method="post">
+<form asp-action="Create" method="post">
 
     <div class="mb-3">
         <label>Başlık</label>
-        <input type="text" name="Title" class="form-control" />
+        <input type="text" name="Title" class="form-control" required />
     </div>
 
     @foreach (var field in Model)

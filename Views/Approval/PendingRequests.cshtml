@@ -1,0 +1,29 @@
+﻿@model BeePM.Models.PendingRequestsViewModel
+
+<h2>Onayımdaki Süreçler</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Başlık</th>
+            <th>Durum</th>
+            <th>Oluşturan</th>
+            <th>Tarih</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var req in Model.Requests)
+        {
+            <tr>
+                <td>@req.Title</td>
+                <td>@req.Status</td>
+                <td>@req.CreatedBy</td>
+                <td>@req.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@req.Id" class="btn btn-sm btn-primary">İncele</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

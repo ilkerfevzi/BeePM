@@ -1,0 +1,37 @@
+﻿@model BeePM.Models.FieldDefinition
+
+<div class="mb-3">
+    <label>@Model.Label</label>
+
+    @switch (Model.FieldType)
+    {
+        case "Textbox":
+            <input type="text" class="form-control" name="field_@Model.Id" />
+            break;
+        case "Numeric":
+            <input type="number" class="form-control" name="field_@Model.Id" />
+            break;
+        case "Combobox":
+            var options = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.Options ?? "[]");
+            <select class="form-select" name="field_@Model.Id">
+                @foreach (var opt in options)
+                {
+                    <option>@opt</option>
+                }
+            </select>
+            break;
+        case "Radio":
+            var radioOpts = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.Options ?? "[]");
+            foreach (var opt in radioOpts)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="field_@Model.Id" value="@opt" />
+                    <label class="form-check-label">@opt</label>
+                </div>
+            }
+            break;
+        default:
+            <input type="text" class="form-control" name="field_@Model.Id" />
+            break;
+    }
+</div>
