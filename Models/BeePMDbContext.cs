@@ -14,13 +14,14 @@ namespace BeePM.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
+            // ApprovalLog → User (FK)
             modelBuilder.Entity<ApprovalLog>()
                 .HasOne(a => a.User)
                 .WithMany(u => u.ApprovalLogs)
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
