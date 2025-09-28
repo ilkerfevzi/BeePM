@@ -24,25 +24,31 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                        <!-- Süreç Başlat -->
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">🏠 Home</a>
+                            <a class="nav-link @(currentController == "Approval" && currentAction == "CreateRequest" ? "active fw-bold" : "")"
+                               asp-controller="Approval" asp-action="CreateRequest">📝 Süreç Başlat</a>
                         </li>
+
+                        <!-- Benim Süreçlerim -->
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Approval" asp-action="Index">📑 Onay Süreci</a>
+                            <a class="nav-link @(currentController == "Approval" && currentAction == "MyRequests" ? "active fw-bold" : "")"
+                               asp-controller="Approval" asp-action="MyRequests">🙋 Benim Süreçlerim</a>
                         </li>
+
+                        <!-- Onayımdaki Süreçler -->
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Approval" asp-action="MyRequests">🙋 Benim Süreçlerim</a>
+                            <a class="nav-link @(currentController == "Approval" && currentAction == "PendingRequests" ? "active fw-bold" : "")"
+                               asp-controller="Approval" asp-action="PendingRequests">✅ Onayımdaki Süreçler</a>
                         </li>
+
+                        <!-- Geçmiş Süreçler -->
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Approval" asp-action="PendingRequests">✅ Onayımda</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Approval" asp-action="History">📜 Geçmiş</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Tasks" asp-action="Index">⚙️ Tasks</a>
+                            <a class="nav-link @(currentController == "Approval" && currentAction == "History" ? "active fw-bold" : "")"
+                               asp-controller="Approval" asp-action="History">📜 Geçmiş Süreçler</a>
                         </li>
                     </ul>
+
                 </div>
             </div>
         </nav>
