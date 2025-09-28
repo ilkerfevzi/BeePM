@@ -2,12 +2,23 @@
 @using Microsoft.AspNetCore.Authorization
 @using System.Security.Claims
 @inject IHttpContextAccessor HttpContextAccessor
-
+@using BeePM.Models
+@inject BeePMDbContext Db
 @{
     var user = HttpContextAccessor.HttpContext?.User;
     var isAuthenticated = user?.Identity?.IsAuthenticated ?? false;
-    var fullName = user?.FindFirst("FullName")?.Value ?? "";
-    var role = user?.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    var fullName = user?.FindFirst("FullName")?.Value ?? ""; 
+    var currentUser = Db.Users.FirstOrDefault(u => u.Username == User.Identity!.Name);
+    var role = currentUser?.Role ?? "Guest";
+
+    string badgeClass = role switch
+    {
+        "Admin" => "badge bg-danger",
+        "Manager" => "badge bg-success",
+        "Board" => "badge bg-warning text-dark",
+        "Employee" => "badge bg-primary",
+        _ => "badge bg-secondary"
+    };
 }
 
 <!DOCTYPE html>
@@ -22,58 +33,29 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="/">BeePM</a>
         <div class="collapse navbar-collapse">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/Approval/CreateRequest">Yeni Talep</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Approval/MyRequests">Benim Taleplerim</a>
+                </li>
 
-                @if (isAuthenticated)
+                @if (role == "Manager" || role == "Admin")
                 {
-                    <!-- Ortak linkler -->
                     <li class="nav-item">
-                        <a class="nav-link" href="/Approval/CreateRequest">Yeni Talep</a>
+                        <a class="nav-link" href="/Approval/PendingRequests">Onayımdaki Talepler</a>
                     </li>
+                }
+                @if (role == "Admin")
+                {
                     <li class="nav-item">
-                        <a class="nav-link" href="/Approval/MyRequests">Benim Taleplerim</a>
+                        <a class="nav-link" href="/Approval/Logs">Approval Logs</a>
                     </li>
-
-                    @if (role == "Manager" || role == "Admin")
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Approval/PendingRequests">Onayımdaki Talepler</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Approval/Logs">Approval Logs</a>
-                        </li>
-                    }
-
-                    @if (role == "Admin")
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Admin/Users">Kullanıcı Yönetimi</a>
-                        </li>
-                    }
                 }
             </ul>
 
-            <ul class="navbar-nav ml-auto">
-                @if (isAuthenticated)
-                {
-                    <li class="nav-item">
-                        <span class="navbar-text text-white mr-3">
-                            👤 @fullName (@role)
-                        </span>
-                    </li>
-                    <li class="nav-item">
-                        <form asp-controller="Account" asp-action="Logout" method="get">
-                            <button type="submit" class="btn btn-outline-light">Çıkış</button>
-                        </form>
-                    </li>
-                }
-                else
-                {
-                    <li class="nav-item">
-                        <a class="btn btn-outline-light" href="/Account/Login">Giriş</a>
-                    </li>
-                }
-            </ul>
+            <span class="@badgeClass">@role</span>
         </div>
     </nav>
 

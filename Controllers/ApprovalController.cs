@@ -94,6 +94,34 @@ namespace BeePM.Controllers
             return View(model);
         }
 
+        [HttpGet("logs")]
+        public IActionResult Logs()
+        {
+            var logs = _db.ApprovalLogs
+                .OrderByDescending(x => x.Timestamp)
+                .Take(200)
+                .Select(l => new
+                {
+                    l.Id,
+                    l.Timestamp,
+                    l.Message,
+                    UserFullName = l.User != null ? l.User.FullName : "—",
+                    UserRole = l.User != null ? l.User.Role : "—"
+                })
+                .ToList()
+                .Select(l => new ApprovalLog
+                {
+                    Id = l.Id,
+                    Timestamp = l.Timestamp,
+                    Message = l.Message,
+                    User = new User { FullName = l.UserFullName, Role = l.UserRole }
+                })
+                .ToList();
+
+            return View(logs);
+        }
+
+
 
 
         [HttpPost("start")]

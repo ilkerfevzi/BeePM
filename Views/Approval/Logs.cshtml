@@ -1,0 +1,39 @@
+﻿@model IEnumerable<BeePM.Models.ApprovalLog>
+@{
+    ViewBag.Title = "Approval Logs";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Approval Logs</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tarih</th>
+            <th>Kullanıcı</th>
+            <th>Mesaj</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model)
+        {
+            var role = log.User?.Role ?? "—";
+            string badgeClass = role switch
+            {
+                "Admin" => "badge bg-danger",
+                "Manager" => "badge bg-success",
+                "Board" => "badge bg-warning text-dark",
+                "Employee" => "badge bg-primary",
+                _ => "badge bg-secondary"
+            };
+
+            <tr>
+                <td>@log.Timestamp.ToString("g")</td>
+                <td>
+                    @log.User?.FullName
+                    <span class="@badgeClass">@role</span>
+                </td>
+                <td>@log.Message</td>
+            </tr>
+        }
+    </tbody>
+</table>
