@@ -10,7 +10,8 @@
 
         public string? PasswordHash { get; set; }
 
-        // Navigation
+        public string Role { get; set; } = "Employee"; // ✅ default
+
         public ICollection<ApprovalLog> ApprovalLogs { get; set; } = new List<ApprovalLog>();
     }
 }

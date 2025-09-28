@@ -47,6 +47,19 @@
                             <a class="nav-link @(currentController == "Approval" && currentAction == "History" ? "active fw-bold" : "")"
                                asp-controller="Approval" asp-action="History">📜 Geçmiş Süreçler</a>
                         </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            var currentUser = Context.RequestServices.GetRequiredService<BeePMDbContext>()
+                            .Users.FirstOrDefault(u => u.Username == User.Identity!.Name);
+
+                            if (currentUser?.Role == "Admin")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentController == "FlowDesigner" ? "active fw-bold" : "")"
+                                       asp-controller="FlowDesigner" asp-action="Index">🛠 Flow Designer</a>
+                                </li>
+                            }
+                        }
                     </ul>
 
                 </div>

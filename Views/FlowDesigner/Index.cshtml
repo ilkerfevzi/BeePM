@@ -1,0 +1,31 @@
+﻿@model IEnumerable<BeePM.Models.ApprovalFlow>
+
+<h2>Flow Designer</h2>
+<p><a class="btn btn-primary" asp-action="Create">Yeni Adım Ekle</a></p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Request Type</th>
+            <th>Step</th>
+            <th>Role</th>
+            <th>Action</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.RequestType</td>
+                <td>@item.StepNumber</td>
+                <td>@item.ApproverRole</td>
+                <td>@item.ActionType</td>
+                <td>
+                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id">Düzenle</a>
+                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Sil</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

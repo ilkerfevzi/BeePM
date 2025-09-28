@@ -4,6 +4,7 @@ using BeePM.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeePM.Migrations
 {
     [DbContext(typeof(BeePMDbContext))]
-    partial class BeePMDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250928101235_AddUserRole")]
+    partial class AddUserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,6 +166,27 @@ namespace BeePM.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("FieldDefinitions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FieldType = "Textbox",
+                            Label = "Talep Nedeni"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            FieldType = "Combobox",
+                            Label = "Talep Edilen Ürün",
+                            Options = "[\"Laptop\",\"Telefon\",\"Tablet\"]"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            FieldType = "Numeric",
+                            Label = "Adet"
+                        });
                 });
 
             modelBuilder.Entity("BeePM.Models.User", b =>
@@ -191,36 +215,6 @@ namespace BeePM.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FullName = "User 1 Çalışan",
-                            Role = "Employee",
-                            Username = "employee1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            FullName = "User 2 Müdür",
-                            Role = "Manager",
-                            Username = "manager1"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            FullName = "User 3 Yönetim Kurulu",
-                            Role = "Board",
-                            Username = "board1"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            FullName = "Admin Kullanıcı",
-                            Role = "Admin",
-                            Username = "admin"
-                        });
                 });
 
             modelBuilder.Entity("BeePM.Models.ApprovalLog", b =>
