@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
- 
+using BCrypt.Net;
 
 namespace BeePM.Controllers
 {
@@ -75,31 +75,41 @@ namespace BeePM.Controllers
             return View();
         }
 
+
+
         [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
+        public IActionResult Login(string username, string password)
         {
             var user = _db.Users.FirstOrDefault(u => u.Username == username);
-
-            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            if (user == null)
             {
-                ModelState.AddModelError("", "Kullanıcı adı veya şifre hatalı.");
+                ModelState.AddModelError("", "Kullanıcı bulunamadı.");
                 return View();
             }
 
+            // ✅ BCrypt ile şifre doğrula
+            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            {
+                ModelState.AddModelError("", "Geçersiz şifre.");
+                return View();
+            }
+
+            // Login başarılı
             var claims = new List<Claim>
     {
         new Claim(ClaimTypes.Name, user.Username),
         new Claim("FullName", user.FullName),
-        new Claim("Role", user.Role)
+        new Claim(ClaimTypes.Role, user.Role)
     };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            return RedirectToAction("Index", "Approval");
+            return RedirectToAction("Index", "Home");
         }
+
 
 
 
