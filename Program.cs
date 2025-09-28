@@ -6,17 +6,31 @@ using Elsa.EntityFrameworkCore.SqlServer;
 using Elsa.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args); 
 
 builder.Services.AddSingleton<ApprovalLogService>();
 
 builder.Services.AddDbContext<BeePM.Models.BeePMDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BeePM")));
 
+// Cookie Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/Login";
+    });
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+var app = builder.Build();
+
+app.UseAuthentication(); // <-- ekledik
+app.UseAuthorization();
 
 
 // Elsa runtime + HTTP aktiviteleri
@@ -46,8 +60,7 @@ builder.Services.AddHttpClient("Elsa", client =>
     // 📌 IIS’e deploy edince burayı güncelle:
     // client.BaseAddress = new Uri("https://intranet.firma.com/BeePM");
 });
-
-var app = builder.Build();
+ 
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

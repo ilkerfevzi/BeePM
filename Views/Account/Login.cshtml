@@ -1,0 +1,25 @@
+﻿@{
+    ViewBag.Title = "Giriş Yap";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Giriş Yap</h2>
+
+<form method="post" asp-action="Login" asp-controller="Account">
+    <div class="form-group">
+        <label for="username">Kullanıcı Adı</label>
+        <input type="text" name="username" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Şifre</label>
+        <input type="password" name="password" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Giriş</button>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger mt-2">@ViewBag.Error</div>
+    }
+</form>
