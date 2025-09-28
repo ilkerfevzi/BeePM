@@ -20,10 +20,20 @@ namespace BeePM.Controllers
         public IActionResult Index()
         {
             var logs = _db.ApprovalLogs
-                          .OrderByDescending(x => x.Timestamp)
-                          .Take(50)
-                          .ToList();
-            return View(logs);
+                  .OrderByDescending(x => x.Timestamp)
+                  .Take(50)
+                  .ToList();
+
+            // Son karar
+            var lastDecision = logs.FirstOrDefault()?.Message ?? "";
+
+            var model = new ApprovalViewModel
+            {
+                Logs = logs,
+                LastDecision = lastDecision
+            };
+
+            return View(model);
         }
 
         [HttpPost("start")]
