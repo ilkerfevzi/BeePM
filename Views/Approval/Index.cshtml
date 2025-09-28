@@ -1,23 +1,37 @@
-﻿@{
-    ViewData["Title"] = "Onay Ekranı";
-}
+﻿@model IEnumerable<BeePM.Models.ApprovalLog>
 
 <h2>Onay Süreci</h2>
 
-<div class="alert alert-info">
-    @if (TempData["msg"] != null)
-    {
-        <strong>Durum:</strong> 
-        @TempData["msg"]
-    }
-</div>
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-info">@TempData["msg"]</div>
+}
+
+<form asp-action="Start" method="post">
+    <button class="btn btn-primary">▶ Workflow Başlat</button>
+</form>
+
+<hr />
+
+<form asp-action="Step1" method="post">
+    <button name="decision" value="Onay" class="btn btn-success">✔ Kullanıcı1 Onay</button>
+    <button name="decision" value="Red" class="btn btn-danger">✘ Kullanıcı1 Red</button>
+</form>
+
+<hr />
+
+<form asp-action="Step2" method="post">
+    <button name="decision" value="Onay" class="btn btn-success">✔ Kullanıcı2 Onay</button>
+    <button name="decision" value="Red" class="btn btn-danger">✘ Kullanıcı2 Red</button>
+</form>
+
+<hr />
 
 <h4>Geçmiş Log</h4>
-<table class="table table-sm table-striped">
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Tarih</th>
-            <th>Kullanıcı</th>
             <th>Mesaj</th>
         </tr>
     </thead>
@@ -26,7 +40,6 @@
         {
             <tr>
                 <td>@log.Timestamp.ToString("dd.MM.yyyy HH:mm")</td>
-                <td>@log.User?.FullName ?? "-"</td>
                 <td>@log.Message</td>
             </tr>
         }

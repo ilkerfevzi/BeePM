@@ -2,90 +2,85 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
-namespace BeePM.Controllers;
-
-[Route("approval")]
-public class ApprovalController : Controller
+namespace BeePM.Controllers
 {
-    private readonly BeePMDbContext _db;
-    private readonly HttpClient _http; 
-
-    private readonly IHttpClientFactory _httpFactory;
-
-    public ApprovalController(IHttpClientFactory httpFactory)
+    [Route("approval")]
+    public class ApprovalController : Controller
     {
-        _httpFactory = httpFactory;
-    }
+        private readonly BeePMDbContext _db;
+        private readonly IHttpClientFactory _httpFactory;
 
-    [HttpPost("step1")]
-    public async Task<IActionResult> Step1(string decision)
-    {
-        var currentUser = _db.Users.FirstOrDefault(u => u.Username == User.Identity!.Name);
-
-        _db.ApprovalLogs.Add(new ApprovalLog
+        public ApprovalController(BeePMDbContext db, IHttpClientFactory httpFactory)
         {
-            Timestamp = DateTime.Now,
-            Message = $"Kullanıcı1 → {decision}",
-            UserId = currentUser?.Id ?? 0 // Kullanıcı bulunamazsa 0 yaz, istersen "system" kullanıcı ekle
-        });
-        _db.SaveChanges();
-
-        var http = _httpFactory.CreateClient();
-        var res = await http.PostAsync("/workflows/approval/step1",
-            new StringContent(decision, Encoding.UTF8, "text/plain"));
-
-        TempData["msg"] = $"Step1 → {(int)res.StatusCode} {res.ReasonPhrase}";
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost("step2")]
-    public async Task<IActionResult> Step2(string decision)
-    {
-        var currentUser = _db.Users.FirstOrDefault(u => u.Username == User.Identity!.Name);
-        if (currentUser == null)
-        {
-            currentUser = new User
-            {
-                Username = User.Identity!.Name ?? "system",
-                FullName = "Otomatik Kullanıcı"
-            };
-            _db.Users.Add(currentUser);
-            _db.SaveChanges();
+            _db = db;
+            _httpFactory = httpFactory;
         }
 
-        _db.ApprovalLogs.Add(new ApprovalLog
+        [HttpGet("")]
+        public IActionResult Index()
         {
-            Timestamp = DateTime.Now,
-            Message = $"Kullanıcı → {decision}",
-            UserId = currentUser.Id
-        });
-        _db.SaveChanges();
+            var logs = _db.ApprovalLogs
+                          .OrderByDescending(x => x.Timestamp)
+                          .Take(50)
+                          .ToList();
+            return View(logs);
+        }
 
-        var http = _httpFactory.CreateClient("Elsa");
-        var res = await http.PostAsync("/workflows/approval/step2",
-            new StringContent(decision, Encoding.UTF8, "text/plain"));
+        [HttpPost("start")]
+        public async Task<IActionResult> Start()
+        {
+            var http = _httpFactory.CreateClient("Elsa");
+            await http.PostAsync("/workflows/approval/start",
+                new StringContent("", Encoding.UTF8, "text/plain"));
 
-        TempData["msg"] = $"Kullanıcı2 → {decision}";
-        return RedirectToAction("Index");
-    }
+            _db.ApprovalLogs.Add(new ApprovalLog
+            {
+                Timestamp = DateTime.Now,
+                Message = "Workflow başlatıldı",
+                UserId = 1 // 👈 geçici admin id
+            });
+            _db.SaveChanges();
 
-    [HttpGet]
-    public IActionResult Index()
-    {
-        return View();
-    }
+            TempData["msg"] = "Workflow başlatıldı";
+            return RedirectToAction(nameof(Index));
+        }
 
-    [HttpPost("approval/send")]
-    public async Task<IActionResult> Send(string karar)
-    {
-        using var client = new HttpClient();
-        var url = "https://localhost:5001/workflows/approval-callback"; // Elsa HttpEndpoint adresi
-        var content = new StringContent(karar, System.Text.Encoding.UTF8, "text/plain");
+        [HttpPost("step1")]
+        public async Task<IActionResult> Step1(string decision)
+        {
+            var http = _httpFactory.CreateClient("Elsa");
+            await http.PostAsync("/workflows/approval/step1",
+                new StringContent(decision, Encoding.UTF8, "text/plain"));
 
-        var response = await client.PostAsync(url, content);
-        var respText = await response.Content.ReadAsStringAsync();
+            _db.ApprovalLogs.Add(new ApprovalLog
+            {
+                Timestamp = DateTime.Now,
+                Message = $"Kullanıcı1 kararı: {decision}",
+                UserId = 1
+            });
+            _db.SaveChanges();
 
-        ViewBag.Response = respText;
-        return View("Index");
+            TempData["msg"] = $"Step1 → {decision}";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost("step2")]
+        public async Task<IActionResult> Step2(string decision)
+        {
+            var http = _httpFactory.CreateClient("Elsa");
+            await http.PostAsync("/workflows/approval/step2",
+                new StringContent(decision, Encoding.UTF8, "text/plain"));
+
+            _db.ApprovalLogs.Add(new ApprovalLog
+            {
+                Timestamp = DateTime.Now,
+                Message = $"Kullanıcı2 kararı: {decision}",
+                UserId = 1
+            });
+            _db.SaveChanges();
+
+            TempData["msg"] = $"Step2 → {decision}";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
