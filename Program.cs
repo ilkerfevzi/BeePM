@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Elsa.Http;
 using Elsa.EntityFrameworkCore.Extensions; 
 
+
 var builder = WebApplication.CreateBuilder(args);
 // Elsa runtime + HTTP aktiviteleri
 builder.Services.AddElsa(elsa =>
@@ -57,20 +58,27 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+// Elsa 3 endpointleri
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
+// Elsa HTTP endpointlerini aç
+app.MapControllers();
+app.MapRazorPages(); 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthentication();
-app.UseAuthorization();
-
-// ✅ Elsa 3 endpointleri
-app.MapElsaWorkflows();
-
-app.MapRazorPages();
+app.UseAuthorization(); 
+ 
 app.MapControllers();
+app.MapRazorPages();
+
+// ✅ Elsa 3 için doğru olan:
+app.UseWorkflows();
 
 app.MapControllerRoute(
     name: "default",
@@ -125,9 +133,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllers();
-
-// Elsa HTTP endpoint’lerini devreye al
-app.UseWorkflows();
+  
 
 
 
