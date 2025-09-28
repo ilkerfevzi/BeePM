@@ -1,22 +1,30 @@
 ﻿@model BeePM.Models.ApprovalRequest
+@{
+    ViewBag.Title = "Yeni Onay Talebi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<h2>Yeni Onay Talebi</h2>
-
-<form asp-action="CreateRequest" method="post">
-    <div class="form-group">
-        <label>Başlık</label>
-        <input asp-for="Title" class="form-control" />
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            Yeni Onay Talebi
+        </div>
+        <div class="card-body">
+            <form asp-action="CreateRequest" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Başlık</label>
+                    <input asp-for="Title" class="form-control" placeholder="Talep başlığı (örn: Laptop alımı)" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Talep Nedeni</label>
+                    <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Bu talebin gerekçesini yazınız..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Talep Edilen</label>
+                    <input asp-for="RequestedItem" class="form-control" placeholder="Talep edilen ürün veya hizmet" />
+                </div>
+                <button type="submit" class="btn btn-success w-100">Talebi Gönder</button>
+            </form>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label>Talep Nedeni</label>
-        <textarea asp-for="Reason" class="form-control"></textarea>
-    </div>
-
-    <div class="form-group">
-        <label>Talep Edilen</label>
-        <input asp-for="RequestedItem" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Gönder</button>
-</form>
+</div>

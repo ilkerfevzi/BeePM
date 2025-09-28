@@ -1,27 +1,34 @@
 ﻿@model BeePM.Models.MyRequestsViewModel
+@{
+    ViewBag.Title = "Benim Taleplerim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<h2>Benim Süreçlerim</h2>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Başlık</th>
-            <th>Durum</th>
-            <th>Tarih</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var req in Model.Requests)
-        {
+<div class="container mt-5">
+    <h3 class="mb-3">Benim Taleplerim</h3>
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
             <tr>
-                <td>@req.Title</td>
-                <td>@req.Status</td>
-                <td>@req.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@req.Id" class="btn btn-sm btn-info">Detay</a>
-                </td>
+                <th>Başlık</th>
+                <th>Talep Edilen</th>
+                <th>Durum</th>
+                <th>Oluşturulma Tarihi</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Requests)
+            {
+                <tr>
+                    <td>@r.Title</td>
+                    <td>@r.RequestedItem</td>
+                    <td>
+                        <span class="badge @(r.Status == "Pending" ? "bg-warning" : r.Status == "Approved" ? "bg-success" : "bg-danger")">
+                            @r.Status
+                        </span>
+                    </td>
+                    <td>@r.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

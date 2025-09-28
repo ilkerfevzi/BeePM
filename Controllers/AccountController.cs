@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using BCrypt.Net;
+using BCryptNet = BCrypt.Net.BCrypt;
 
 namespace BeePM.Controllers
 {
@@ -85,22 +86,23 @@ namespace BeePM.Controllers
                 ModelState.AddModelError("", "Kullanıcı bulunamadı.");
                 return View();
             }
-
-            // ✅ Şifre doğrulama (NULL check ile)
-            if (string.IsNullOrEmpty(user.PasswordHash) || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            // var hash = BCrypt.Net.BCrypt.HashPassword("admin123");
+            // Console.WriteLine(hash);
+            // ✅ Şifre doğrulama (trim ile)
+            var passwordClean = password.Trim();
+            if (string.IsNullOrEmpty(user.PasswordHash) || !BCrypt.Net.BCrypt.Verify(passwordClean, user.PasswordHash))
             {
                 ModelState.AddModelError("", "Geçersiz şifre.");
                 return View();
             }
 
-
-            // ✅ Claims oluştur
+            // ✅ Claims
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim("FullName", user.FullName),
-                new Claim(ClaimTypes.Role, user.Role)
-            };
+    {
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim("FullName", user.FullName),
+        new Claim(ClaimTypes.Role, user.Role)
+    };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
@@ -109,6 +111,7 @@ namespace BeePM.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Logout()

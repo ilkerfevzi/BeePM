@@ -5,28 +5,45 @@
 
 <div class="row justify-content-center mt-5">
     <div class="col-md-4">
-        <h3 class="text-center">BeePM Giriş</h3>
-        <form asp-action="Login" method="post">
-            <div class="mb-3">
-                <label for="username" class="form-label">Kullanıcı Adı</label>
-                <input type="text" class="form-control" id="username" name="username" required />
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Şifre</label>
-                <input type="password" class="form-control" id="password" name="password" required />
-            </div>
+        <div class="card shadow">
+            <div class="card-body">
+                <h3 class="text-center mb-4">BeePM Giriş</h3>
+                <form asp-action="Login" method="post">
+                     
+                    <div class="mb-3">
+                        <label for="username" class="form-label" aria-label="Kullanıcı Adı">Kullanıcı Adı</label>
+                        <input type="text" class="form-control" id="username" name="username" required
+                            autocomplete="username" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label" aria-label="Şifre">Şifre</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password" required
+                                autocomplete="current-password" />
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">Göster</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Giriş Yap</button>
 
-            <button type="submit" class="btn btn-primary w-100">Giriş Yap</button>
-
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="alert alert-danger mt-3">
-                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    @if (!ViewData.ModelState.IsValid)
                     {
-                        <div>@error.ErrorMessage</div>
+                        <div class="alert alert-danger mt-3">
+                            <strong>Giriş başarısız!</strong>
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <div>@error.ErrorMessage</div>
+                            }
+                        </div>
                     }
-                </div>
-            }
-        </form>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
+<p class="text-muted text-center">Giriş yaptıktan sonra ana sayfaya yönlendirileceksiniz.</p>
+<script>
+    function togglePassword() {
+        var pwd = document.getElementById('password');
+        pwd.type = pwd.type === 'password' ? 'text' : 'password';
+    }
+</script>

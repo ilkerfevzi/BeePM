@@ -1,8 +1,61 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using System.Security.Claims
+@{
+    ViewBag.Title = "Ana Sayfa";
+    var fullName = User.FindFirst("FullName")?.Value ?? User.Identity?.Name;
+    var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "Guest";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2>Hoş geldiniz, @fullName 👋</h2>
+        <p class="text-muted">Rolünüz: <span class="badge bg-info">@role</span></p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Yeni Talep</h5>
+                    <p class="card-text">Yeni bir onay süreci başlatın.</p>
+                    <a href="/Approval/Create" class="btn btn-primary w-100">Talep Oluştur</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Benim Taleplerim</h5>
+                    <p class="card-text">Başlattığınız talepleri görüntüleyin.</p>
+                    <a href="/Approval/MyRequests" class="btn btn-success w-100">Taleplerim</a>
+                </div>
+            </div>
+        </div>
+
+        @if (role == "Manager" || role == "Admin")
+        {
+            <div class="col-md-4">
+                <div class="card shadow-sm border-warning">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Onayımdaki Talepler</h5>
+                        <p class="card-text">Sizin onayınızı bekleyen süreçler.</p>
+                        <a href="/Approval/PendingRequests" class="btn btn-warning w-100">Onay Bekleyen</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (role == "Admin")
+        {
+            <div class="col-md-4 mt-3">
+                <div class="card shadow-sm border-dark">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Sistem Logları</h5>
+                        <p class="card-text">Tüm süreçlerin geçmiş loglarını görüntüleyin.</p>
+                        <a href="/Approval/Logs" class="btn btn-dark w-100">Logları Görüntüle</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>

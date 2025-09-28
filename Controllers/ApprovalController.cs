@@ -40,6 +40,7 @@ namespace BeePM.Controllers
 
         }
         // Benim süreçlerim
+        [HttpGet("myrequests")]
         public IActionResult MyRequests()
         {
             var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
@@ -53,6 +54,7 @@ namespace BeePM.Controllers
         }
 
         // Onayımdaki süreçler
+        [HttpGet("pendingrequests")]
         public IActionResult PendingRequests()
         {
             var requests = _db.ApprovalRequests
@@ -130,8 +132,9 @@ namespace BeePM.Controllers
             var http = _httpFactory.CreateClient("Elsa");
             await http.PostAsync("/workflows/approval/start",
                 new StringContent("", Encoding.UTF8, "text/plain"));
+            var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
 
-            _db.ApprovalLogs.Add(new ApprovalLog { Timestamp = DateTime.Now, Message = "Workflow başlatıldı", UserId = 1 });
+            _db.ApprovalLogs.Add(new ApprovalLog { Timestamp = DateTime.Now, Message = "Workflow başlatıldı", UserId = currentUser.Id });
             _db.SaveChanges();
             TempData["msg"] = "Workflow başlatıldı";
             return RedirectToAction(nameof(Index));
@@ -143,8 +146,9 @@ namespace BeePM.Controllers
             var http = _httpFactory.CreateClient("Elsa");
             await http.PostAsync("/workflows/approval/step1",
                 new StringContent(decision, Encoding.UTF8, "text/plain"));
+            var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
 
-            _db.ApprovalLogs.Add(new ApprovalLog { Timestamp = DateTime.Now, Message = $"Kullanıcı1 kararı: {decision}", UserId = 1 });
+            _db.ApprovalLogs.Add(new ApprovalLog { Timestamp = DateTime.Now, Message = $"Kullanıcı1 kararı: {decision}", UserId = currentUser.Id });
             _db.SaveChanges();
             TempData["msg"] = $"Step1 → {decision}";
             return RedirectToAction(nameof(Index));
@@ -156,8 +160,9 @@ namespace BeePM.Controllers
             var http = _httpFactory.CreateClient("Elsa");
             await http.PostAsync("/workflows/approval/step2",
                 new StringContent(decision, Encoding.UTF8, "text/plain"));
+            var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
 
-            _db.ApprovalLogs.Add(new ApprovalLog { Timestamp = DateTime.Now, Message = $"Kullanıcı2 kararı: {decision}", UserId = 1 });
+            _db.ApprovalLogs.Add(new ApprovalLog { Timestamp = DateTime.Now, Message = $"Kullanıcı2 kararı: {decision}", UserId = currentUser.Id });
             _db.SaveChanges();
             TempData["msg"] = $"Step2 → {decision}";
             return RedirectToAction(nameof(Index));
@@ -181,7 +186,7 @@ namespace BeePM.Controllers
             var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
             request.CreatedBy = currentUser.Id;
             request.Status = "Pending";
-            request.CreatedAt = DateTime.Now;
+            request.CreatedAt = DateTime.Now; 
 
             _db.ApprovalRequests.Add(request);
             _db.SaveChanges();
@@ -199,12 +204,13 @@ namespace BeePM.Controllers
 
             req.Status = decision == "Onay" ? "Approved" : "Rejected";
             _db.SaveChanges();
-
+            var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
+             
             _db.ApprovalLogs.Add(new ApprovalLog
             {
                 Timestamp = DateTime.Now,
-                Message = $"User2 kararı: {decision}",
-                UserId = 2 // şimdilik hardcoded
+                Message = $"User kararı: {decision}",
+                UserId = currentUser.Id
             });
             _db.SaveChanges();
 

@@ -1,33 +1,36 @@
-﻿@model IEnumerable<BeePM.Models.ApprovalRequest>
+﻿@model BeePM.Models.PendingRequestsViewModel
+@{
+    ViewBag.Title = "Onay Bekleyen Talepler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<h2>Onayımda Olan Talepler</h2>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Başlık</th>
-            <th>Talep Nedeni</th>
-            <th>Talep Edilen</th>
-            <th>Durum</th>
-            <th>Aksiyon</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var req in Model)
-        {
+<div class="container mt-5">
+    <h3 class="mb-3">Onay Bekleyen Talepler</h3>
+    <table class="table table-hover">
+        <thead class="table-dark">
             <tr>
-                <td>@req.Title</td>
-                <td>@req.Reason</td>
-                <td>@req.RequestedItem</td>
-                <td>@req.Status</td>
-                <td>
-                    <form asp-action="Decide" method="post" style="display:inline;">
-                        <input type="hidden" name="requestId" value="@req.Id" />
-                        <button type="submit" name="decision" value="Onay" class="btn btn-success">Onayla</button>
-                        <button type="submit" name="decision" value="Red" class="btn btn-danger">Reddet</button>
-                    </form>
-                </td>
+                <th>Başlık</th>
+                <th>Talep Eden</th>
+                <th>Durum</th>
+                <th>İşlem</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Requests)
+            {
+                <tr>
+                    <td>@r.Title</td>
+                    <td>@r.CreatedBy</td>
+                    <td><span class="badge bg-warning">@r.Status</span></td>
+                    <td>
+                        <form asp-action="Decide" method="post" class="d-inline">
+                            <input type="hidden" name="requestId" value="@r.Id" />
+                            <button type="submit" name="decision" value="Onay" class="btn btn-success btn-sm">Onayla</button>
+                            <button type="submit" name="decision" value="Red" class="btn btn-danger btn-sm">Reddet</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

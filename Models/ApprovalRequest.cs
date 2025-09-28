@@ -15,7 +15,7 @@ namespace BeePM.Models
         public string Status { get; set; } = "Pending";
 
         // 🔗 İlişki
-        public User? CreatedUser { get; set; }
+        //public User? CreatedUser { get; set; }
         public ICollection<ApprovalRequestField> Fields { get; set; } = new List<ApprovalRequestField>();
     }
 }
