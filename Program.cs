@@ -1,12 +1,12 @@
 ﻿using BeePM.Services; 
+using Elsa.EntityFrameworkCore.Extensions; 
 using Elsa.EntityFrameworkCore.Modules.Management;
 using Elsa.EntityFrameworkCore.Modules.Runtime;
 using Elsa.EntityFrameworkCore.SqlServer;
 using Elsa.Extensions;
+using Elsa.Http;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using Elsa.Http;
-using Elsa.EntityFrameworkCore.Extensions; 
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,11 +32,10 @@ builder.Services.AddElsa(elsa =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddSingleton<ApprovalLogService>(); 
-
 builder.Services.AddDbContext<BeePM.Models.BeePMDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BeePM")));
 
-// Cookie Authentication
+/// Cookie Authentication (sadece 1 kere)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -49,24 +48,7 @@ builder.Services.AddHttpClient("Elsa", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7192");
 });
-
-
-
-
-
-
-
-builder.Services.AddDbContext<BeePM.Models.BeePMDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BeePM")));
-
-// Cookie Authentication
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.LogoutPath = "/Account/Logout";
-        options.AccessDeniedPath = "/Account/Login";
-    });
+ 
 
 // Elsa için HttpClient
 builder.Services.AddHttpClient("Elsa", client =>
@@ -87,10 +69,7 @@ app.UseAuthorization();
 app.UseHttpsRedirection();
 app.UseStaticFiles(); 
 app.UseRouting();  
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"); 
-app.MapControllers();
+
 
 if (!app.Environment.IsDevelopment())
 {
@@ -99,6 +78,9 @@ if (!app.Environment.IsDevelopment())
 }
 app.MapRazorPages();
 // ✅ Elsa 3 için doğru olan:
-app.UseWorkflows(); 
-
+app.UseWorkflows();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllers();
 app.Run();
