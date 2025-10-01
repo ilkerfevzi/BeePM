@@ -1,0 +1,30 @@
+﻿@model IEnumerable<BeePM.Models.FormElement>
+
+<h2>Alanlar (@ViewBag.TemplateName)</h2>
+
+<a class="btn btn-primary mb-3" href="/FormElements/Create?templateId=@ViewBag.TemplateId">Yeni Alan Ekle</a>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Sıra</th>
+        <th>Etiket</th>
+        <th>Tip</th>
+        <th>Zorunlu</th>
+        <th>Seçenekler</th>
+        <th>İşlemler</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.OrderNo</td>
+            <td>@item.Label</td>
+            <td>@item.ElementType</td>
+            <td>@(item.IsRequired ? "Evet" : "Hayır")</td>
+            <td>@item.Options</td>
+            <td>
+                <a href="/FormElements/Edit/@item.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                <a href="/FormElements/Delete/@item.Id" class="btn btn-sm btn-danger">Sil</a>
+            </td>
+        </tr>
+    }
+</table>

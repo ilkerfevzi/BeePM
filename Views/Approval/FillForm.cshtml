@@ -1,0 +1,43 @@
+﻿@model BeePM.Models.ViewModels.FillFormViewModel
+
+<h2>@Model.Title</h2>
+
+<form asp-action="FillForm" asp-route-requestId="@Model.RequestId" method="post">
+    @foreach (var e in Model.Elements)
+    {
+        <div class="mb-3">
+            <label class="form-label">@e.Label</label>
+
+            @switch (e.ElementType)
+            {
+                case "TextBox":
+                    <input name="@e.Label" class="form-control" />
+                    break;
+                case "TextArea":
+                    <textarea name="@e.Label" class="form-control"></textarea>
+                    break;
+                case "ComboBox":
+                    var options = (e.Options ?? "").Split(',');
+                    <select name="@e.Label" class="form-select">
+                        @foreach (var opt in options)
+                        {
+                            <option value="@opt">@opt</option>
+                        }
+                    </select>
+                    break;
+                case "RadioButton":
+                    var radios = (e.Options ?? "").Split(',');
+                    foreach (var opt in radios)
+                    {
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="@e.Label" value="@opt" />
+                            <label class="form-check-label">@opt</label>
+                        </div>
+                    }
+                    break;
+            }
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+</form>

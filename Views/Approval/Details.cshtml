@@ -1,39 +1,46 @@
-﻿@model BeePM.Models.RequestDetailsViewModel
+﻿@model BeePM.Models.ViewModels.RequestDetailsViewModel
 
-<h2>Süreç Detayı</h2>
+<h2>@Model.Request.Title</h2>
+<p><strong>Durum:</strong> @Model.Request.Status</p>
+<p><strong>Oluşturan:</strong> @Model.Request.CreatedBy</p>
+<p><strong>Oluşturulma Tarihi:</strong> @Model.Request.CreatedAt</p>
 
-<div class="card mb-3">
-    <div class="card-body">
-        <h4>@Model.Request.Title</h4> 
-        <p><b>Durum:</b> @Model.Request.Status</p>
-        <p><b>Oluşturan:</b> @Model.Request.CreatedBy</p>
-        <p><b>Tarih:</b> @Model.Request.CreatedAt</p>
-    </div>
-</div>
+<hr />
 
-<h3>Geçmiş Log</h3>
-<table class="table table-sm table-striped">
+<h4>Form Verileri</h4>
+<table class="table table-bordered">
     <thead>
         <tr>
-            <th>Tarih</th>
-            <th>Mesaj</th>
+            <th>Alan</th>
+            <th>Değer</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var log in Model.Logs)
+        @foreach (var e in Model.Elements)
         {
             <tr>
-                <td>@log.Timestamp.ToString("dd.MM.yyyy HH:mm")</td>
-                <td>@log.Message</td>
+                <td>@e.Label</td>
+                <td>
+                    @(Model.FormData.ContainsKey(e.Label) ? Model.FormData[e.Label] : "—")
+                </td>
             </tr>
         }
     </tbody>
 </table>
 
-@if (User.Identity.IsAuthenticated)
+<hr />
+
+@if (Model.Request.Status == "Pending")
 {
-    <form method="post" asp-action="Decide" asp-route-requestId="@Model.Request.Id">
+    <form asp-action="Decide" method="post">
+        <input type="hidden" name="requestId" value="@Model.Request.Id" />
         <button type="submit" name="decision" value="Onay" class="btn btn-success">Onayla</button>
         <button type="submit" name="decision" value="Red" class="btn btn-danger">Reddet</button>
     </form>
+}
+else
+{
+    <div class="alert alert-info">
+        Bu talep zaten <strong>@Model.Request.Status</strong> olarak kapatılmış.
+    </div>
 }

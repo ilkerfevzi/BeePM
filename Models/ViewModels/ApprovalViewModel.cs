@@ -1,4 +1,4 @@
-﻿namespace BeePM.Models
+﻿namespace BeePM.Models.ViewModels
 {
     public class ApprovalViewModel
     {

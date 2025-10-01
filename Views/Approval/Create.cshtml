@@ -1,30 +1,59 @@
 ﻿@model BeePM.Models.ApprovalRequest
 @{
-    ViewBag.Title = "Yeni Onay Talebi";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    var templates = ViewBag.FormTemplates as List<BeePM.Models.FormTemplate>;
 }
 
-<div class="container mt-5">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            Yeni Onay Talebi
-        </div>
-        <div class="card-body">
-            <form asp-action="CreateRequest" method="post">
-                <div class="mb-3">
-                    <label class="form-label">Başlık</label>
-                    <input asp-for="Title" class="form-control" placeholder="Talep başlığı (örn: Laptop alımı)" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Talep Nedeni</label>
-                    <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Bu talebin gerekçesini yazınız..."></textarea>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Talep Edilen</label>
-                    <input asp-for="RequestedItem" class="form-control" placeholder="Talep edilen ürün veya hizmet" />
-                </div>
-                <button type="submit" class="btn btn-success w-100">Talebi Gönder</button>
-            </form>
-        </div>
+<h3>Yeni Talep Oluştur</h3>
+
+<form asp-action="CreateRequest" method="post">
+    <div class="mb-3">
+        <label>Form Şablonu Seç</label>
+        <select name="formTemplateId" class="form-select" id="templateSelect">
+            @foreach (var t in templates)
+            {
+                <option value="@t.Id">@t.Name</option>
+            }
+        </select>
     </div>
-</div>
+
+    <div id="formFields"></div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+</form>
+
+@section Scripts {
+    <script>
+        const templates = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(templates));
+        const container = document.getElementById("formFields");
+        const select = document.getElementById("templateSelect");
+
+        function renderFields(templateId) {
+            const template = templates.find(t => t.Id == templateId);
+            if (!template) return;
+            container.innerHTML = "";
+
+            template.Fields.forEach(f => {
+                let html = "";
+                if (f.FieldType === "Textbox") {
+                    html = `<div class="mb-3"><label>${f.Label}</label>
+                            <input type="text" name="${f.Label}" class="form-control" /></div>`;
+                }
+                else if (f.FieldType === "Numeric") {
+                    html = `<div class="mb-3"><label>${f.Label}</label>
+                            <input type="number" name="${f.Label}" class="form-control" /></div>`;
+                }
+                else if (f.FieldType === "Combobox") {
+                    const opts = JSON.parse(f.Options || "[]");
+                    html = `<div class="mb-3"><label>${f.Label}</label>
+                            <select name="${f.Label}" class="form-select">
+                            ${opts.map(o => `<option value="${o}">${o}</option>`).join("")}
+                            </select></div>`;
+                }
+                container.innerHTML += html;
+            });
+        }
+
+        select.addEventListener("change", e => renderFields(e.target.value));
+        renderFields(select.value);
+    </script>
+}

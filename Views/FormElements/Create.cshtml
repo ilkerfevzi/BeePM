@@ -1,0 +1,42 @@
+﻿@model BeePM.Models.FormElement
+
+<h2>Yeni Alan Ekle</h2>
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="FormTemplateId" />
+
+    <div class="mb-3">
+        <label>Etiket</label>
+        <input asp-for="Label" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Tip</label>
+        <select asp-for="ElementType" class="form-control">
+            <option value="TextBox">TextBox</option>
+            <option value="TextArea">TextArea</option>
+            <option value="ComboBox">ComboBox</option>
+            <option value="RadioButton">RadioButton</option>
+            <option value="CheckBox">CheckBox</option>
+            <option value="PopupSelect">PopupSelect</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Seçenekler (JSON veya virgüllü)</label>
+        <input asp-for="Options" class="form-control" />
+        <small class="text-muted">Örnek: ["Evet","Hayır"] veya Evet,Hayır</small>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="IsRequired" class="form-check-input" />
+        <label class="form-check-label">Zorunlu mu?</label>
+    </div>
+
+    <div class="mb-3">
+        <label>Sıra No</label>
+        <input asp-for="OrderNo" type="number" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Kaydet</button>
+</form>

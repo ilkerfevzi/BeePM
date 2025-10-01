@@ -1,0 +1,25 @@
+﻿@model IEnumerable<BeePM.Models.FormTemplate>
+
+<h2>Form Şablonları</h2>
+<a class="btn btn-primary mb-3" href="/FormTemplates/Create">Yeni Şablon</a>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Ad</th>
+        <th>Açıklama</th>
+        <th>Alan Sayısı</th>
+        <th>İşlemler</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Description</td>
+            <td>@item.Elements.Count</td>
+            <td>
+                <a href="/FormTemplates/Edit/@item.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                <a href="/FormTemplates/Delete/@item.Id" class="btn btn-sm btn-danger">Sil</a>
+            </td>
+        </tr>
+    }
+</table>

@@ -1,5 +1,7 @@
 ﻿using BeePM.Models;
+using BeePM.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 namespace BeePM.Controllers
@@ -80,21 +82,34 @@ namespace BeePM.Controllers
         [HttpGet("details/{id}")]
         public IActionResult Details(int id)
         {
-            var req = _db.ApprovalRequests.Find(id);
+            var req = _db.ApprovalRequests
+                .Where(r => r.Id == id)
+                .Select(r => new {
+                    Request = r,
+                    Template = r.FormTemplate!,
+                    Elements = _db.FormElements.Where(e => e.FormTemplateId == r.FormTemplateId).OrderBy(e => e.OrderNo).ToList()
+                })
+                .FirstOrDefault();
+
             if (req == null) return NotFound();
 
-            var logs = _db.ApprovalLogs.Where(l => l.UserId == req.CreatedBy || l.Message.Contains($"Request {id}"))
-                                       .OrderByDescending(l => l.Timestamp)
-                                       .ToList();
-
-            var model = new RequestDetailsViewModel
+            // JSON → Dictionary parse et
+            var formData = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(req.Request.FormDataJson))
             {
-                Request = req,
-                Logs = logs
+                formData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(req.Request.FormDataJson) ?? new();
+            }
+
+            var vm = new RequestDetailsViewModel
+            {
+                Request = req.Request,
+                Elements = req.Elements,
+                FormData = formData
             };
 
-            return View(model);
+            return View(vm);
         }
+
 
         [HttpGet("logs")]
         public IActionResult Logs()
@@ -178,21 +193,80 @@ namespace BeePM.Controllers
         [HttpGet("create")]
         public IActionResult Create()
         {
+            var templates = _db.FormTemplates.Include(t => t.Fields).ToList();
+            ViewBag.FormTemplates = templates;
             return View(new ApprovalRequest());
         }
         [HttpPost("create")]
-        public IActionResult CreateRequest(ApprovalRequest request)
+        public IActionResult CreateRequest(int formTemplateId, IFormCollection form)
         {
             var currentUser = _db.Users.First(u => u.Username == User.Identity!.Name);
-            request.CreatedBy = currentUser.Id;
-            request.Status = "Pending";
-            request.CreatedAt = DateTime.Now; 
 
-            _db.ApprovalRequests.Add(request);
+            // Template alanlarını oku
+            var template = _db.FormTemplates.Include(t => t.Fields)
+                                            .FirstOrDefault(t => t.Id == formTemplateId);
+            if (template == null) return NotFound();
+
+            // Form verilerini JSON’a çevir
+            var formData = new Dictionary<string, string>();
+            foreach (var field in template.Fields)
+            {
+                var value = form[field.Label];
+                formData[field.Label] = value!;
+            }
+            string formJson = System.Text.Json.JsonSerializer.Serialize(formData);
+
+            var req = new ApprovalRequest
+            {
+                CreatedBy = currentUser.Id,
+                CreatedAt = DateTime.Now,
+                Status = "Pending",
+                FormTemplateId = formTemplateId,
+                FormDataJson = formJson
+            };
+
+            _db.ApprovalRequests.Add(req);
             _db.SaveChanges();
 
             TempData["msg"] = "Yeni onay süreci başlatıldı.";
-            return RedirectToAction("PendingRequests");
+            return RedirectToAction("MyRequests");
+        }
+
+        [HttpGet("fillform/{requestId}")]
+        public IActionResult FillForm(int requestId)
+        {
+            var req = _db.ApprovalRequests
+                .Where(r => r.Id == requestId)
+                .Select(r => new {
+                    Request = r,
+                    Template = r.FormTemplate!,
+                    Elements = _db.FormElements.Where(e => e.FormTemplateId == r.FormTemplateId).OrderBy(e => e.OrderNo).ToList()
+                })
+                .FirstOrDefault();
+
+            if (req == null) return NotFound();
+
+            var vm = new FillFormViewModel
+            {
+                RequestId = req.Request.Id,
+                Title = req.Request.Title,
+                Elements = req.Elements
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost("fillform/{requestId}")]
+        public IActionResult FillForm(int requestId, Dictionary<string, string> formValues)
+        {
+            var req = _db.ApprovalRequests.Find(requestId);
+            if (req == null) return NotFound();
+
+            req.FormDataJson = System.Text.Json.JsonSerializer.Serialize(formValues);
+            _db.SaveChanges();
+
+            TempData["msg"] = "Form başarıyla kaydedildi.";
+            return RedirectToAction("MyRequests");
         }
 
 

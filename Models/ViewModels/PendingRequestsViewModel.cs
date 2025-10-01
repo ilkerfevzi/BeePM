@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace BeePM.Models
+namespace BeePM.Models.ViewModels
 {
-    public class MyRequestsViewModel
+    public class PendingRequestsViewModel
     {
         public List<ApprovalRequest> Requests { get; set; } = new();
     }

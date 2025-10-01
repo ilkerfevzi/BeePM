@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BeePM.Models
+namespace BeePM.Models.ViewModels
 {
     public class CompletedRequestsViewModel
     {

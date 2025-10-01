@@ -1,0 +1,15 @@
+﻿@model BeePM.Models.FormTemplate
+
+<h2>Yeni Form Şablonu</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label>Ad</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Açıklama</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Kaydet</button>
+</form>

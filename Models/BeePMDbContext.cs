@@ -14,6 +14,9 @@ namespace BeePM.Models
         public DbSet<FieldDefinition> FieldDefinitions { get; set; }
         public DbSet<ApprovalRequestField> ApprovalRequestFields { get; set; }
         public DbSet<ApprovalFlow> ApprovalFlows { get; set; }
+        public DbSet<FormTemplate> FormTemplates { get; set; }
+        public DbSet<FormElement> FormElements { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //base.OnModelCreating(modelBuilder);
