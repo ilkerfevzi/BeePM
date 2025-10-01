@@ -23,8 +23,10 @@ namespace BeePM.Models
         public string FieldType { get; set; } = ""; // Textbox, Combobox...
         public string? Options { get; set; }
         public bool IsRequired { get; set; }
+        public int Order { get; set; } = 0;             // Form içindeki sıralama
 
         public FormTemplate? Template { get; set; }
+        public FormTemplate FormTemplate { get; set; }  // Navigation
     }
     public class FormElement
     {
