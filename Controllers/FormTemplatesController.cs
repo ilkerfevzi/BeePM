@@ -50,7 +50,7 @@ namespace BeePM.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var template = _db.FormTemplates.FirstOrDefault(t => t.Id == id);
+            var template = _db.FormTemplates.Include(t => t.Fields).FirstOrDefault(t => t.Id == id);
             if (template == null) return NotFound();
 
             // Alanları da yükleyelim
