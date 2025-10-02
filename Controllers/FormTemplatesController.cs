@@ -21,32 +21,75 @@ namespace BeePM.Controllers
 
         public IActionResult Create()
         {
-            return View();
+            return View(new FormTemplate());
         }
 
+        //[HttpPost]
+        //public IActionResult Create(FormTemplate template)
+        //{
+        //    template.CreatedBy = 1; // TODO: oturum açan kullanıcıdan al
+        //    template.CreatedAt = DateTime.Now;
+        //    _db.FormTemplates.Add(template);
+        //    _db.SaveChanges();
+        //    return RedirectToAction(nameof(Index));
+        //}
+        // POST: /FormTemplates/Create
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(FormTemplate template)
         {
-            template.CreatedBy = 1; // TODO: oturum açan kullanıcıdan al
-            template.CreatedAt = DateTime.Now;
-            _db.FormTemplates.Add(template);
-            _db.SaveChanges();
-            return RedirectToAction(nameof(Index));
+            if (ModelState.IsValid)
+            {
+                _db.FormTemplates.Add(template);
+                _db.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(template);
         }
-
+        // GET: /FormTemplates/Edit/5 → Designer
+        [HttpGet]
         public IActionResult Edit(int id)
         {
-            var template = _db.FormTemplates.Include(f => f.Elements).FirstOrDefault(f => f.Id == id);
+            var template = _db.FormTemplates.FirstOrDefault(t => t.Id == id);
             if (template == null) return NotFound();
+
+            // Alanları da yükleyelim
+            var fields = _db.FormFields.Where(f => f.FormTemplateId == id).ToList();
+            ViewBag.Fields = fields;
+
             return View(template);
         }
 
+        // POST: /FormTemplates/Edit/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(FormTemplate template)
         {
-            _db.FormTemplates.Update(template);
+            if (ModelState.IsValid)
+            {
+                _db.FormTemplates.Update(template);
+                _db.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(template);
+        }
+
+        // Alan ekleme (Designer içinden çağrılacak)
+        [HttpPost]
+        public IActionResult AddField(int templateId, string label, string fieldType, bool isRequired, string? options)
+        {
+            var field = new FormField
+            {
+                FormTemplateId = templateId,
+                Label = label,
+                FieldType = fieldType,
+                IsRequired = isRequired,
+                Options = options
+            };
+
+            _db.FormFields.Add(field);
             _db.SaveChanges();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Edit", new { id = templateId });
         }
 
         public IActionResult Delete(int id)

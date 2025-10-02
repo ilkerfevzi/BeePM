@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BeePM.Models
 {
@@ -25,8 +26,10 @@ namespace BeePM.Models
         public bool IsRequired { get; set; }
         public int Order { get; set; } = 0;             // Form içindeki sıralama
 
-        public FormTemplate? Template { get; set; }
-        public FormTemplate FormTemplate { get; set; }  // Navigation
+        [ForeignKey(nameof(FormTemplateId))]
+        public FormTemplate? FormTemplate { get; set; }
+        //public FormTemplate? Template { get; set; }
+        //public FormTemplate FormTemplate { get; set; }  // Navigation
     }
     public class FormElement
     {
