@@ -64,15 +64,15 @@ builder.Services.AddHttpClient("Elsa", client =>
 
 var app = builder.Build();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");
 
+app.UseRouting();
 app.UseAuthentication(); // <-- ekledik
 app.UseAuthorization();  
 app.UseHttpsRedirection();
-app.UseStaticFiles(); 
-app.UseRouting();  
+app.UseStaticFiles();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 
 if (!app.Environment.IsDevelopment())

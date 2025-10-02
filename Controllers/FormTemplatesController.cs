@@ -15,7 +15,7 @@ namespace BeePM.Controllers
 
         public IActionResult Index()
         {
-            var templates = _db.FormTemplates.Include(f => f.Elements).ToList();
+            var templates = _db.FormTemplates.Include(f => f.Fields).ToList();
             return View(templates);
         }
 

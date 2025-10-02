@@ -10,10 +10,9 @@ namespace BeePM.Models
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public int CreatedBy { get; set; }
-        public User? CreatedByUser { get; set; }
+        //public int CreatedBy { get; set; }
+        //public User? CreatedByUser { get; set; }
 
-        public ICollection<FormElement> Elements { get; set; } = new List<FormElement>();
         public ICollection<FormField> Fields { get; set; } = new List<FormField>();
     }
     public class FormField
@@ -24,7 +23,7 @@ namespace BeePM.Models
         public string FieldType { get; set; } = ""; // Textbox, Combobox...
         public string? Options { get; set; }
         public bool IsRequired { get; set; }
-        public int Order { get; set; } = 0;             // Form içindeki sıralama
+        public int OrderNo { get; set; } = 0;             // Form içindeki sıralama
 
         [ForeignKey(nameof(FormTemplateId))]
         public FormTemplate? FormTemplate { get; set; }
