@@ -19,5 +19,8 @@
   "homepage": "https://github.com/ilkerfevzi/BeePM#readme",
   "dependencies": {
     "bpmn-js": "^18.7.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.37.0"
   }
 }

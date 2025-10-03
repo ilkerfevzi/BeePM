@@ -38,23 +38,25 @@
 
     <!-- Properties Panel JS (UMD versiyonu) -->
     <script src="~/lib/bpmn/bpmn-js-properties-panel/bpmn-js-properties-panel.umd.js"></script>
-    <script src="~/lib/bpmn/bpmn-js-properties-panel/provider/bpmn.umd.js"></script> 
-
+     
     <script>
                 // DB’den gelen BPMN XML (veya boş string)
                 var flowJson = `@Html.Raw((ViewBag.FlowJson ?? "{}").ToString().Replace("`", "\\`"))`;
 
                 // BPMN Modeler initialize
-            const bpmnModeler = new BpmnJS({
-            container: '#canvas',
-            propertiesPanel: {
-                parent: '#properties-panel'
-            },
-            additionalModules: [
-                BpmnPropertiesPanelModule,
-                BpmnPropertiesProviderModule
-            ]
+                            const bpmnModeler = new BpmnJS({
+          container: '#canvas',
+          propertiesPanel: {
+            parent: '#properties-panel'
+          },
+          additionalModules: [
+            window.BpmnPropertiesPanel?.BpmnPropertiesPanelModule || window.BpmnJSPropertiesPanel.BpmnPropertiesPanelModule,
+            window.BpmnPropertiesPanel?.BpmnPropertiesProviderModule || window.BpmnJSPropertiesPanel.BpmnPropertiesProviderModule
+          ]
         });
+
+
+
 
                 // Varsayılan diagram
                 const defaultDiagram = `<?xml version="1.0" encoding="UTF-8"?>
