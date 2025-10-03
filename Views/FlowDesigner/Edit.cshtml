@@ -7,8 +7,17 @@
 <h2>Flow Designer - @Model.Name</h2>
 <hr />
 
-<!-- BPMN Designer Alanı -->
-<div id="canvas" style="width:100%; height:600px; border:1px solid #ccc;"></div>
+<div class="row">
+    <div class="col-md-9">
+        <!-- BPMN Canvas -->
+        <div id="canvas" style="width:100%; height:600px; border:1px solid #ccc;"></div>
+    </div>
+    <div class="col-md-3">
+        <!-- Properties Panel -->
+        <div id="properties-panel"
+             style="height:600px; border:1px solid #ccc; overflow:auto;"></div>
+    </div>
+</div>
 
 <div class="mt-3">
     <button id="btnSaveFlow" class="btn btn-success">💾 Kaydet</button>
@@ -16,73 +25,100 @@
 </div>
 
 @section Scripts {
-    <!-- BPMN.io CSS + JS -->
+    <!-- BPMN.io CSS -->
     <link rel="stylesheet" href="https://unpkg.com/bpmn-js@11.5.0/dist/assets/diagram-js.css" />
     <link rel="stylesheet" href="https://unpkg.com/bpmn-js@11.5.0/dist/assets/bpmn-font/css/bpmn.css" />
-    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@11.5.0/dist/bpmn-js.css" />
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@11.5.0/dist/assets/bpmn-js.css" />
 
-    <script src="https://unpkg.com/bpmn-js@11.5.0/dist/bpmn-modeler.development.js"></script>
+    <!-- Properties Panel CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js-properties-panel@1.0.0/dist/assets/bpmn-js-properties-panel.css" />
+
+    <!-- BPMN.io core -->
+    <script src="https://unpkg.com/bpmn-js@11.5.0/dist/bpmn-modeler.production.min.js"></script>
+
+    <!-- Properties Panel JS (UMD versiyonu) -->
+    <script src="https://unpkg.com/bpmn-js-properties-panel@1.0.0/dist/bpmn-js-properties-panel.min.js"></script>
+    <script src="https://unpkg.com/bpmn-js-properties-panel@1.0.0/dist/provider/bpmn.min.js"></script>
+
+
 
     <script>
-                // DB’den gelen BPMN XML
+                // DB’den gelen BPMN XML (veya boş string)
                 var flowJson = `@Html.Raw((ViewBag.FlowJson ?? "{}").ToString().Replace("`", "\\`"))`;
 
                 // BPMN Modeler initialize
-                var bpmnModeler = new BpmnJS({
-                    container: '#canvas',
-                    keyboard: { bindTo: window }
-                });
+                            const bpmnModeler = new BpmnJS({
+          container: '#canvas',
+          propertiesPanel: {
+            parent: '#properties-panel'
+          },
+          additionalModules: [
+            BpmnJSPropertiesPanel,   // UMD’den gelen global isim
+            BpmnJSPropertiesProvider
+          ]
+        });
 
-                // Eğer DB’de kayıtlı BPMN varsa yükle
-                if (flowJson && flowJson !== "{}") {
-                    bpmnModeler.importXML(flowJson).then(() => {
-                        console.log("✅ BPMN Yüklendi");
-                        bpmnModeler.get('canvas').zoom('fit-viewport');
-                    }).catch(err => {
-                        console.error("❌ BPMN yüklenemedi", err);
-                    });
-                } else {
-                    // Boş diyagram başlat
-                    const defaultDiagram = `<?xml version="1.0" encoding="UTF-8"?>
+                // Varsayılan diagram
+                const defaultDiagram = `<?xml version="1.0" encoding="UTF-8"?>
         <bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
             targetNamespace="http://bpmn.io/schema/bpmn">
           <bpmn:process id="Process_1" isExecutable="false">
-            <bpmn:startEvent id="StartEvent_1"/>
+            <bpmn:startEvent id="StartEvent_1" name="Başla" />
+            <bpmn:task id="Task_1" name="İlk Görev" />
+            <bpmn:endEvent id="EndEvent_1" name="Bitir" />
+            <bpmn:sequenceFlow id="flow1" sourceRef="StartEvent_1" targetRef="Task_1" />
+            <bpmn:sequenceFlow id="flow2" sourceRef="Task_1" targetRef="EndEvent_1" />
           </bpmn:process>
           <bpmndi:BPMNDiagram id="BPMNDiagram_1">
             <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
               <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
                 <dc:Bounds x="179" y="79" width="36" height="36"/>
               </bpmndi:BPMNShape>
+              <bpmndi:BPMNShape id="Task_1_di" bpmnElement="Task_1">
+                <dc:Bounds x="240" y="60" width="100" height="80"/>
+              </bpmndi:BPMNShape>
+              <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+                <dc:Bounds x="400" y="79" width="36" height="36"/>
+              </bpmndi:BPMNShape>
             </bpmndi:BPMNPlane>
           </bpmndi:BPMNDiagram>
         </bpmn:definitions>`;
 
-                    bpmnModeler.importXML(defaultDiagram).then(() => {
+                // Yükleme
+                (async function () {
+                    try {
+                        if (flowJson && flowJson !== "{}") {
+                            await bpmnModeler.importXML(flowJson);
+                        } else {
+                            await bpmnModeler.importXML(defaultDiagram);
+                        }
                         bpmnModeler.get('canvas').zoom('fit-viewport');
-                    });
-                }
+                        console.log("✅ BPMN diagram yüklendi");
+                    } catch (err) {
+                        console.error("❌ BPMN yüklenemedi:", err);
+                    }
+                })();
 
                 // Kaydet butonu
-                document.getElementById('btnSaveFlow').addEventListener('click', async () => {
+                $('#btnSaveFlow').click(async function () {
                     try {
                         const { xml } = await bpmnModeler.saveXML({ format: true });
 
-                        const form = new FormData();
-                        form.append('id', '@Model.Id');
-                        form.append('flowJson', xml);
-
-                        const res = await fetch('/FlowDesigner/Save', { method: 'POST', body: form });
-                        const data = await res.json();
-
-                        if (data?.success) {
-                            alert("✔ Süreç kaydedildi!");
-                        } else {
-                            alert("❌ Kaydetme hatası");
-                        }
+                        $.ajax({
+                            url: '/FlowDesigner/Save',
+                            type: 'POST',
+                            data: { id: @Model.Id, flowJson: xml },
+                            success: function (res) {
+                                if (res.success) {
+                                    alert("✔ Süreç kaydedildi!");
+                                } else {
+                                    alert("❌ Kaydetme hatası");
+                                }
+                            }
+                        });
                     } catch (err) {
                         console.error("Kaydetme hatası:", err);
                         alert("❌ BPMN export edilemedi");

@@ -1,0 +1,1 @@
+// placeholder: properties panel umd js
