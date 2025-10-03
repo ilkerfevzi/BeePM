@@ -26,36 +26,34 @@
 
 @section Scripts {
     <!-- BPMN.io CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@11.5.0/dist/assets/diagram-js.css" />
-    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@11.5.0/dist/assets/bpmn-font/css/bpmn.css" />
-    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@11.5.0/dist/assets/bpmn-js.css" />
+    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/diagram-js.css" />
+    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/bpmn-font/css/bpmn.css" />
+    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/bpmn-js.css" /> 
 
     <!-- Properties Panel CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/bpmn-js-properties-panel@1.0.0/dist/assets/bpmn-js-properties-panel.css" />
+    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js-properties-panel/assets/properties-panel.css" />
 
     <!-- BPMN.io core -->
-    <script src="https://unpkg.com/bpmn-js@11.5.0/dist/bpmn-modeler.production.min.js"></script>
+    <script src="~/lib/bpmn/bpmn-js/bpmn-modeler.production.min.js"></script> 
 
     <!-- Properties Panel JS (UMD versiyonu) -->
-    <script src="https://unpkg.com/bpmn-js-properties-panel@1.0.0/dist/bpmn-js-properties-panel.min.js"></script>
-    <script src="https://unpkg.com/bpmn-js-properties-panel@1.0.0/dist/provider/bpmn.min.js"></script>
-
-
+    <script src="~/lib/bpmn/bpmn-js-properties-panel/bpmn-js-properties-panel.umd.js"></script>
+    <script src="~/lib/bpmn/bpmn-js-properties-panel/provider/bpmn.umd.js"></script> 
 
     <script>
                 // DB’den gelen BPMN XML (veya boş string)
                 var flowJson = `@Html.Raw((ViewBag.FlowJson ?? "{}").ToString().Replace("`", "\\`"))`;
 
                 // BPMN Modeler initialize
-                            const bpmnModeler = new BpmnJS({
-          container: '#canvas',
-          propertiesPanel: {
-            parent: '#properties-panel'
-          },
-          additionalModules: [
-            BpmnJSPropertiesPanel,   // UMD’den gelen global isim
-            BpmnJSPropertiesProvider
-          ]
+            const bpmnModeler = new BpmnJS({
+            container: '#canvas',
+            propertiesPanel: {
+                parent: '#properties-panel'
+            },
+            additionalModules: [
+                BpmnPropertiesPanelModule,
+                BpmnPropertiesProviderModule
+            ]
         });
 
                 // Varsayılan diagram
