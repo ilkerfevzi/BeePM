@@ -85,5 +85,39 @@ namespace BeePM.Controllers
             _db.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
+
+        // GET: /FlowDesigner/Users?term=adm
+        [HttpGet]
+        public IActionResult Users(string term)
+        {
+            var q = (term ?? "").Trim();
+
+            var users = _db.Users
+                .Where(u => q == "" ||
+                            u.FullName.Contains(q) ||
+                            u.Username.Contains(q))
+                .OrderBy(u => u.FullName)
+                .Take(20)
+                .Select(u => new
+                {
+                    // Select2 "id/text" sözleşmesi
+                    id = u.Username,                           // XML’de camunda:assignee olarak saklanacak
+                    text = u.FullName + " (" + u.Username + ")"
+                })
+                .ToList();
+
+            return Json(users);
+        }
+
+
+
+
+
+
+
+
+
+
+
     }
 }
