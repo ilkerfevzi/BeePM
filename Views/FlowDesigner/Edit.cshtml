@@ -1,0 +1,62 @@
+﻿@model BeePM.Models.ApprovalFlow
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Flow Designer";
+}
+<h2>Flow Designer</h2>
+
+<div id="myDiagramDiv" style="border: solid 1px black; width:100%; height:600px"></div>
+
+<button id="btnSave" class="btn btn-success mt-3">Kaydet</button>
+<button id="btnLoad" class="btn btn-secondary mt-3">Yükle</button>
+
+@section Scripts {
+    <script src="https://unpkg.com/gojs/release/go.js"></script>
+    <script>
+        var $ = go.GraphObject.make;
+
+        var myDiagram =
+          $(go.Diagram, "myDiagramDiv",
+            {
+                "undoManager.isEnabled": true
+            });
+
+        // Node şablonları
+        myDiagram.nodeTemplate =
+          $(go.Node, "Auto",
+            $(go.Shape, "RoundedRectangle",
+              { strokeWidth: 0, fill: "lightblue" },
+              new go.Binding("fill", "color")),
+            $(go.TextBlock,
+              { margin: 8 },
+              new go.Binding("text", "text"))
+          );
+
+        // Load mevcut JSON
+        var initialJson = @Html.Raw(Json.Serialize(ViewBag.FlowJson));
+        if (initialJson && initialJson !== "{}") {
+            myDiagram.model = go.Model.fromJson(initialJson);
+        } else {
+            myDiagram.model = new go.GraphLinksModel();
+        }
+
+        // Kaydet
+        $("#btnSave").click(function () {
+            var json = myDiagram.model.toJson();
+            $.ajax({
+                url: '@Url.Action("Save", "FlowDesigner")',
+                type: 'POST',
+                data: { id: @Model.Id, flowJson: json },
+                success: function (res) {
+                    if (res.success) alert("Flow kaydedildi!");
+                }
+            });
+        });
+
+        // Yükle (veritabanındaki JSON’u tekrar yükler)
+        $("#btnLoad").click(function () {
+            var json = @Html.Raw(Json.Serialize(ViewBag.FlowJson));
+            myDiagram.model = go.Model.fromJson(json);
+        });
+    </script>
+}

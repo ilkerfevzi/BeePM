@@ -4,19 +4,10 @@ namespace BeePM.Models
 {
     public class ApprovalFlow
     {
-        [Key]
         public int Id { get; set; }
-
-        [Required]
-        public string RequestType { get; set; } = "";
-
-        [Required]
-        public int StepNumber { get; set; }
-
-        [Required]
-        public string ApproverRole { get; set; } = "";
-
-        [Required]
-        public string ActionType { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
+        public string? FlowJson { get; set; }
     }
 }

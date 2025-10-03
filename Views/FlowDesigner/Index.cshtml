@@ -17,10 +17,10 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.RequestType</td>
+                @* <td>@item.RequestType</td>
                 <td>@item.StepNumber</td>
                 <td>@item.ApproverRole</td>
-                <td>@item.ActionType</td>
+                <td>@item.ActionType</td> *@
                 <td>
                     <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id">Düzenle</a>
                     <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Sil</a>

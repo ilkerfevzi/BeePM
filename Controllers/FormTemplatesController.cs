@@ -13,6 +13,8 @@ namespace BeePM.Controllers
             _db = db;
         }
 
+        [HttpGet("")]
+        [HttpGet("Index")]
         public IActionResult Index()
         {
             var templates = _db.FormTemplates.Include(f => f.Fields).ToList();
@@ -24,16 +26,6 @@ namespace BeePM.Controllers
             return View(new FormTemplate());
         }
 
-        //[HttpPost]
-        //public IActionResult Create(FormTemplate template)
-        //{
-        //    template.CreatedBy = 1; // TODO: oturum açan kullanıcıdan al
-        //    template.CreatedAt = DateTime.Now;
-        //    _db.FormTemplates.Add(template);
-        //    _db.SaveChanges();
-        //    return RedirectToAction(nameof(Index));
-        //}
-        // POST: /FormTemplates/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(FormTemplate template)
