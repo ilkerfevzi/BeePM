@@ -1,29 +1,36 @@
 ﻿@model IEnumerable<BeePM.Models.ApprovalFlow>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Flow Listesi";
+}
 
-<h2>Flow Designer</h2>
-<p><a class="btn btn-primary" asp-action="Create">Yeni Adım Ekle</a></p>
+<h2>Flow Listesi</h2>
+<hr />
 
-<table class="table table-bordered">
+<p>
+    <a class="btn btn-primary" asp-action="Create">+ Yeni Süreç</a>
+</p>
+
+<table class="table table-striped">
     <thead>
         <tr>
-            <th>Request Type</th>
-            <th>Step</th>
-            <th>Role</th>
-            <th>Action</th>
+            <th>Adı</th>
+            <th>Açıklama</th>
+            <th>Oluşturulma</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var flow in Model)
         {
             <tr>
-                @* <td>@item.RequestType</td>
-                <td>@item.StepNumber</td>
-                <td>@item.ApproverRole</td>
-                <td>@item.ActionType</td> *@
-                <td>
-                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id">Düzenle</a>
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Sil</a>
+                <td>@flow.Name</td>
+                <td>@flow.Description</td>
+                <td>@flow.CreatedAt?.ToString("dd.MM.yyyy HH:mm")</td>
+                <td class="text-nowrap">
+                    <a asp-action="Edit" asp-route-id="@flow.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                    <a asp-action="Delete" asp-route-id="@flow.Id" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Silmek istediğinize emin misiniz?');">Sil</a>
                 </td>
             </tr>
         }
