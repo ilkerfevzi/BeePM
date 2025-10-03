@@ -27,7 +27,7 @@
                 // DB’den gelen BPMN XML
                 var flowJson = `@Html.Raw((ViewBag.FlowJson ?? "{}").ToString().Replace("`", "\\`"))`;
 
-                // BPMN Modeler initialize (palette ve klavye desteği aktif)
+                // BPMN Modeler initialize
                 var bpmnModeler = new BpmnJS({
                     container: '#canvas',
                     keyboard: { bindTo: window }
@@ -37,7 +37,7 @@
                 if (flowJson && flowJson !== "{}") {
                     bpmnModeler.importXML(flowJson).then(() => {
                         console.log("✅ BPMN Yüklendi");
-                        bpmnModeler.get('canvas').zoom('fit-viewport'); // otomatik sığdır
+                        bpmnModeler.get('canvas').zoom('fit-viewport');
                     }).catch(err => {
                         console.error("❌ BPMN yüklenemedi", err);
                     });
@@ -67,22 +67,22 @@
                 }
 
                 // Kaydet butonu
-                $('#btnSaveFlow').click(async function () {
+                document.getElementById('btnSaveFlow').addEventListener('click', async () => {
                     try {
                         const { xml } = await bpmnModeler.saveXML({ format: true });
 
-                        $.ajax({
-                            url: '/FlowDesigner/Save',
-                            type: 'POST',
-                            data: { id: @Model.Id, flowJson: xml },
-                            success: function (res) {
-                                if (res.success) {
-                                    alert("✔ Süreç kaydedildi!");
-                                } else {
-                                    alert("❌ Kaydetme hatası");
-                                }
-                            }
-                        });
+                        const form = new FormData();
+                        form.append('id', '@Model.Id');
+                        form.append('flowJson', xml);
+
+                        const res = await fetch('/FlowDesigner/Save', { method: 'POST', body: form });
+                        const data = await res.json();
+
+                        if (data?.success) {
+                            alert("✔ Süreç kaydedildi!");
+                        } else {
+                            alert("❌ Kaydetme hatası");
+                        }
                     } catch (err) {
                         console.error("Kaydetme hatası:", err);
                         alert("❌ BPMN export edilemedi");
