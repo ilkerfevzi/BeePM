@@ -33,36 +33,56 @@
     <!-- Properties Panel CSS -->
     <link rel="stylesheet" href="~/lib/bpmn/bpmn-js-properties-panel/assets/properties-panel.css" />
 
+    <!-- jQuery + Select2 -->
+    <script src="~/lib/select2/jquery.min.js"></script>
+    <link href="~/lib/select2/select2.min.css" rel="stylesheet" />
+    <script src="~/lib/select2/select2.min.js"></script>
+
     <!-- BPMN.io core -->
     <script src="~/lib/bpmn/bpmn-js/bpmn-modeler.production.min.js"></script> 
 
     <!-- Properties Panel JS (UMD versiyonu) -->
     <script src="~/lib/bpmn/bpmn-js-properties-panel/bpmn-js-properties-panel.umd.js"></script>
-    <script src="~/lib/bpmn/custom/custom-props-provider.js" type="module"></script>
-    <script src="~/lib/select2/select2.min.js"></script> 
-    <script src="~/lib/select2/jquery.min.js"></script>
-    <link href="~/lib/select2/select2.min.css" rel="stylesheet" />
+    @* <script src="~/lib/bpmn/custom/custom-props-provider.js" type="module"></script>  *@
+    <script src="~/lib/bpmn/custom/custom-props-provider.js"></script>
+    <script src="~/lib/bpmn/custom/assignee-provider.js"></script>
+
+    
     <script type="module">
                     // Özel modül assignee
-        import CustomAssigneeProvider from '/lib/bpmn/custom/assignee-provider.js';
+        // import CustomAssigneeProvider from '/lib/bpmn/custom/assignee-provider.js';
 
   const {
     BpmnPropertiesPanelModule,
     BpmnPropertiesProviderModule,
     CamundaPlatformPropertiesProviderModule
   } = window.BpmnJSPropertiesPanel;
+          // camunda.json'u yükle
+              async function loadCamundaModdle() {
+                try {
+                  const res = await fetch('@Url.Content("~/lib/bpmn/camunda.json")');
+                  if (!res.ok) throw new Error(res.status);
+                  return await res.json();
+                } catch (e) {
+                  console.warn('camunda.json yüklenemedi, camunda özellikleri devre dışı kalır.', e);
+                  return null;
+                }
+              }
+        (async () => {
+                 const camundaModdle = await loadCamundaModdle();
                     // Özel modül custom-props-provider
-        import CustomPropsProvider from '/lib/bpmn/custom/custom-props-provider.js';
+        // import CustomPropsProvider from '/lib/bpmn/custom/custom-props-provider.js';
 
-        const bpmnModeler = new BpmnJS({
+              const window.bpmnModeler = new BpmnJS({
             container: '#canvas',
+            keyboard: { bindTo: document },
             propertiesPanel: { parent: '#properties-panel' },
             additionalModules: [
                 window.BpmnJSPropertiesPanel.BpmnPropertiesPanelModule,
                 window.BpmnJSPropertiesPanel.BpmnPropertiesProviderModule,
-                CustomPropsProvider,
-                CamundaPlatformPropertiesProviderModule,
-                CustomAssigneeProvider   // bizim custom dropdown
+                window.CustomPropsProvider,
+                window.BpmnJSPropertiesPanel.CamundaPlatformPropertiesProviderModule,
+                window.CustomAssigneeProvider   // bizim custom dropdown
             ],
                   moddleExtensions: { camunda: await (await fetch('/lib/bpmn/camunda.json')).json() }
         });
