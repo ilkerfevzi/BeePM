@@ -23,27 +23,28 @@
 
 @section Scripts {
 
-    <!-- jQuery -> Select2 (SİRA ÖNEMLİ) -->
-    <!-- 1. jQuery -->
+    <!-- jQuery mutlaka ilk -->
     <script src="~/lib/jquery/jquery.min.js"></script>
 
-    <!-- 2. Select2 -->
-    <link rel="stylesheet" href="~/lib/select2/select2.min.css" />
+    <!-- select2 -->
+    <link href="~/lib/select2/select2.min.css" rel="stylesheet" />
     <script src="~/lib/select2/select2.min.js"></script>
 
-    <!-- 3. BPMN -->
-    <script src="~/lib/bpmn/bpmn-js/bpmn-modeler.production.min.js"></script>
+    <!-- BPMN css/js -->
     <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/diagram-js.css" />
     <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/bpmn-font/css/bpmn.css" />
     <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/bpmn-js.css" />
 
-    <!-- 4. Properties Panel -->
-    <script src="~/lib/bpmn/bpmn-js-properties-panel/bpmn-js-properties-panel.umd.js"></script>
     <link rel="stylesheet" href="~/lib/bpmn/bpmn-js-properties-panel/assets/properties-panel.css" />
+    <script src="~/lib/bpmn/bpmn-js/bpmn-modeler.production.min.js"></script>
+    <script src="~/lib/bpmn/bpmn-js-properties-panel/bpmn-js-properties-panel.umd.js"></script>
 
-    <!-- 5. Custom Provider -->
+    <!-- Custom extensions -->
+    <script src="~/lib/bpmn/custom/assignee-provider.js" type="module"></script>
     <script src="~/lib/bpmn/custom/custom-props-provider.js" type="module"></script>
 
+    <!-- En son FlowDesigner JS -->
+    <script src="~/js/flowdesigner-init.js"></script>
     
 
     <script>

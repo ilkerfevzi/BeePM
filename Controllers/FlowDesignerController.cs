@@ -1,6 +1,7 @@
 ﻿using BeePM.Models;
 using Elsa.Workflows.Activities.Flowchart.Activities;
 using Microsoft.AspNetCore.Mvc;
+using Polly;
 
 namespace BeePM.Controllers
 {
@@ -88,25 +89,19 @@ namespace BeePM.Controllers
 
         // GET: /FlowDesigner/Users?term=adm
         [HttpGet]
-        public IActionResult Users(string term)
+        public JsonResult Users(string term)
         {
-            var q = (term ?? "").Trim();
-
-            var users = _db.Users
-                .Where(u => q == "" ||
-                            u.FullName.Contains(q) ||
-                            u.Username.Contains(q))
-                .OrderBy(u => u.FullName)
-                .Take(20)
+            var list = _db.Users
+                .Where(u => string.IsNullOrEmpty(term) || u.FullName.Contains(term))
                 .Select(u => new
                 {
-                    // Select2 "id/text" sözleşmesi
-                    id = u.Username,                           // XML’de camunda:assignee olarak saklanacak
-                    text = u.FullName + " (" + u.Username + ")"
+                    id = u.Username,
+                    text = $"{u.FullName} ({u.Username})"
                 })
+                .Take(20)
                 .ToList();
 
-            return Json(users);
+            return Json(list);
         }
 
 
