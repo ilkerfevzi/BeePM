@@ -9,13 +9,10 @@
 
 <div class="row">
     <div class="col-md-9">
-        <!-- BPMN Canvas -->
         <div id="canvas" style="width:100%; height:600px; border:1px solid #ccc;"></div>
     </div>
     <div class="col-md-3">
-        <!-- Properties Panel -->
-        <div id="properties-panel"
-             style="height:600px; border:1px solid #ccc; overflow:auto;"></div>
+        <div id="properties-panel" style="height:600px; border:1px solid #ccc; overflow:auto;"></div>
     </div>
 </div>
 
@@ -25,73 +22,27 @@
 </div>
 
 @section Scripts {
-    <!-- BPMN.io CSS -->
-    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/diagram-js.css" />
-    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/bpmn-font/css/bpmn.css" />
-    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/bpmn-js.css" /> 
 
-    <!-- Properties Panel CSS -->
-    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js-properties-panel/assets/properties-panel.css" />
-
-    <!-- jQuery + Select2 -->
-    <script src="~/lib/select2/jquery.min.js"></script>
+    <!-- jQuery -> Select2 (SİRA ÖNEMLİ) -->
+    <script src="~/lib/jquery/jquery.min.js"></script>
     <link href="~/lib/select2/select2.min.css" rel="stylesheet" />
     <script src="~/lib/select2/select2.min.js"></script>
 
-    <!-- BPMN.io core -->
-    <script src="~/lib/bpmn/bpmn-js/bpmn-modeler.production.min.js"></script> 
+    <!-- BPMN.io CSS -->
+    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/diagram-js.css" />
+    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/bpmn-font/css/bpmn.css" />
+    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/bpmn-js.css" />
+    <link rel="stylesheet" href="~/lib/bpmn/bpmn-js-properties-panel/assets/properties-panel.css" />
 
-    <!-- Properties Panel JS (UMD versiyonu) -->
+    <!-- BPMN.io core & Properties Panel (UMD) -->
+    <script src="~/lib/bpmn/bpmn-js/bpmn-modeler.production.min.js"></script>
     <script src="~/lib/bpmn/bpmn-js-properties-panel/bpmn-js-properties-panel.umd.js"></script>
-    @* <script src="~/lib/bpmn/custom/custom-props-provider.js" type="module"></script>  *@
-    <script src="~/lib/bpmn/custom/custom-props-provider.js"></script>
-    <script src="~/lib/bpmn/custom/assignee-provider.js"></script>
 
-    
-    <script type="module">
-                    // Özel modül assignee
-        // import CustomAssigneeProvider from '/lib/bpmn/custom/assignee-provider.js';
-
-  const {
-    BpmnPropertiesPanelModule,
-    BpmnPropertiesProviderModule,
-    CamundaPlatformPropertiesProviderModule
-  } = window.BpmnJSPropertiesPanel;
-          // camunda.json'u yükle
-              async function loadCamundaModdle() {
-                try {
-                  const res = await fetch('@Url.Content("~/lib/bpmn/camunda.json")');
-                  if (!res.ok) throw new Error(res.status);
-                  return await res.json();
-                } catch (e) {
-                  console.warn('camunda.json yüklenemedi, camunda özellikleri devre dışı kalır.', e);
-                  return null;
-                }
-              }
-        (async () => {
-                 const camundaModdle = await loadCamundaModdle();
-                    // Özel modül custom-props-provider
-        // import CustomPropsProvider from '/lib/bpmn/custom/custom-props-provider.js';
-
-              const window.bpmnModeler = new BpmnJS({
-            container: '#canvas',
-            keyboard: { bindTo: document },
-            propertiesPanel: { parent: '#properties-panel' },
-            additionalModules: [
-                window.BpmnJSPropertiesPanel.BpmnPropertiesPanelModule,
-                window.BpmnJSPropertiesPanel.BpmnPropertiesProviderModule,
-                window.CustomPropsProvider,
-                window.BpmnJSPropertiesPanel.CamundaPlatformPropertiesProviderModule,
-                window.CustomAssigneeProvider   // bizim custom dropdown
-            ],
-                  moddleExtensions: { camunda: await (await fetch('/lib/bpmn/camunda.json')).json() }
-        });
-    </script>
     <script>
-        // DB’den gelen BPMN XML (veya boş string)
+        // DB’den gelen BPMN XML (veya boş)
         const flowJson = `@Html.Raw((ViewBag.FlowJson ?? "{}").ToString().Replace("`", "\\`"))`;
 
-        // UMD globalinden modülleri al
+        // UMD globali
         const {
           BpmnPropertiesPanelModule,
           BpmnPropertiesProviderModule,
@@ -105,7 +56,7 @@
             if (!res.ok) throw new Error(res.status);
             return await res.json();
           } catch (e) {
-            console.warn('camunda.json yüklenemedi, camunda özellikleri devre dışı kalır.', e);
+            console.warn('camunda.json yüklenemedi, camunda özellikleri devre dışı:', e);
             return null;
           }
         }
@@ -113,170 +64,124 @@
         (async () => {
           const camundaModdle = await loadCamundaModdle();
 
-          // Modeler
-          const bpmnModeler = new BpmnJS({
+          // Modeler (global erişim için window.*)
+          window.bpmnModeler = new BpmnJS({
             container: '#canvas',
-            keyboard: { bindTo: window },
             propertiesPanel: { parent: '#properties-panel' },
             additionalModules: [
-              BpmnPropertiesPanelModule,          // panel
-              BpmnPropertiesProviderModule,       // BPMN default provider
-              CamundaPlatformPropertiesProviderModule // ← camunda alanları (assignee, formKey ... )
+              BpmnPropertiesPanelModule,
+              BpmnPropertiesProviderModule,
+              CamundaPlatformPropertiesProviderModule
             ],
             moddleExtensions: camundaModdle ? { camunda: camundaModdle } : {}
           });
 
-          // Varsayılan diagram
+          // Varsayılan şablon
           const defaultDiagram = `<?xml version="1.0" encoding="UTF-8"?>
           <bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
               xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
               xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-              xmlns:camunda="http://camunda.org/schema/1.0/bpmn"  <!-- camunda ns -->
+              xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
               targetNamespace="http://bpmn.io/schema/bpmn">
             <bpmn:process id="Process_1" isExecutable="false">
               <bpmn:startEvent id="StartEvent_1" name="Başla" />
-              <bpmn:userTask id="Task_1" name="İlk Görev" camunda:assignee="" camunda:formKey="" />
+              <bpmn:userTask id="Task_1" name="Talep Eden" camunda:assignee="" />
               <bpmn:endEvent id="EndEvent_1" name="Bitir" />
               <bpmn:sequenceFlow id="flow1" sourceRef="StartEvent_1" targetRef="Task_1" />
               <bpmn:sequenceFlow id="flow2" sourceRef="Task_1" targetRef="EndEvent_1" />
             </bpmn:process>
-            <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-              <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
-                <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
-                  <dc:Bounds x="179" y="79" width="36" height="36"/>
-                </bpmndi:BPMNShape>
-                <bpmndi:BPMNShape id="Task_1_di" bpmnElement="Task_1">
-                  <dc:Bounds x="240" y="60" width="120" height="80"/>
-                </bpmndi:BPMNShape>
-                <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
-                  <dc:Bounds x="400" y="79" width="36" height="36"/>
-                </bpmndi:BPMNShape>
-              </bpmndi:BPMNPlane>
-            </bpmndi:BPMNDiagram>
           </bpmn:definitions>`;
 
           // Diyagramı yükle
           try {
-            if (flowJson && flowJson !== "{}") {
-              await bpmnModeler.importXML(flowJson);
-            } else {
-              await bpmnModeler.importXML(defaultDiagram);
-            }
+            await bpmnModeler.importXML(flowJson && flowJson !== "{}" ? flowJson : defaultDiagram);
             bpmnModeler.get('canvas').zoom('fit-viewport');
           } catch (err) {
             console.error('BPMN import error:', err);
           }
 
-          // KAYDET (fetch ile)
-          const saveBtn = document.getElementById('btnSaveFlow');
-          saveBtn.addEventListener('click', async () => {
+          // Kaydet
+          $('#btnSaveFlow').on('click', async function () {
             try {
-              saveBtn.disabled = true;
-              saveBtn.textContent = 'Kaydediliyor...';
-
               const { xml } = await bpmnModeler.saveXML({ format: true });
-
-              const body = new URLSearchParams({
-                id: '@Model.Id',
-                flowJson: xml
-              }).toString();
-
               const res = await fetch('@Url.Action("Save", "FlowDesigner")', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-                body
-              });
+                body: new URLSearchParams({ id: '@Model.Id', flowJson: xml })
+              }).then(r => r.json());
 
-              const data = await res.json();
-              alert(data?.success ? '✔ Süreç kaydedildi!' : '❌ Kaydetme hatası');
+              alert(res?.success ? '✔ Süreç kaydedildi!' : '❌ Kaydetme hatası');
             } catch (e) {
               console.error(e);
-              alert('❌ Kaydetme sırasında hata: ' + e.message);
-            } finally {
-              saveBtn.disabled = false;
-              saveBtn.textContent = '💾 Kaydet';
+              alert('❌ Kaydetme hatası: ' + e.message);
             }
           });
+
+          // -------- Assignee alanını Select2'ye çevir --------
+          const eventBus = bpmnModeler.get('eventBus');
+          const modeling = bpmnModeler.get('modeling');
+          const selection = bpmnModeler.get('selection');
+
+          function enhanceAssigneeSelect() {
+            const panel = document.getElementById('properties-panel');
+            if (!panel) return;
+
+            // Camunda provider'ın Assignee girişini yakala
+            const container =
+              panel.querySelector('[data-entry-id="assignee"]') ||
+              panel.querySelector('.bio-properties-panel-entry[id*="assignee"]');
+
+            if (!container || container.dataset.enhanced === '1') return;
+
+            const input = container.querySelector('input');
+            if (!input) return;
+
+            container.dataset.enhanced = '1';
+            input.style.display = 'none';
+
+            const sel = document.createElement('select');
+            sel.id = 'assigneeSelect2';
+            sel.style.width = '100%';
+            input.after(sel);
+
+            $('#assigneeSelect2').select2({
+              placeholder: 'Kullanıcı seç…',
+              allowClear: true,
+              width: '100%',
+              ajax: {
+                url: '/FlowDesigner/Users',
+                dataType: 'json',
+                delay: 250,
+                data: params => ({ term: params?.term ?? '' }),
+                processResults: data => ({ results: data })
+              }
+            });
+
+            // mevcut değer
+            const currentVal = input.value || (selection.get()[0]?.businessObject?.$attrs?.['camunda:assignee'] ?? '');
+            if (currentVal) {
+              const opt = new Option(String(currentVal), String(currentVal), true, true);
+              $('#assigneeSelect2').append(opt).trigger('change');
+            }
+
+            // değişiklik
+            $('#assigneeSelect2').on('change', function () {
+              const el = selection.get()[0];
+              if (!el) return;
+              const val = $(this).val() || '';
+              input.value = val; // panel iç durumu da güncel kalsın
+              modeling.updateProperties(el, { 'camunda:assignee': val });
+            });
+          }
+
+          // panel yeniden çizildiğinde Select2'yi tekrar uygula
+          const obs = new MutationObserver(() => setTimeout(enhanceAssigneeSelect, 50));
+          obs.observe(document.getElementById('properties-panel'), { childList: true, subtree: true });
+
+          // ilk yükleme & seçim değişimi
+          setTimeout(enhanceAssigneeSelect, 200);
+          eventBus.on('selection.changed', () => setTimeout(enhanceAssigneeSelect, 50));
         })();
     </script>
 }
-<script>
-     // --- bpmnModeler zaten yukarıda oluşturulmuş olmalı ---
-     const eventBus = bpmnModeler.get('eventBus');
-     const modeling = bpmnModeler.get('modeling');
-
-     let currentElement = null;
-
-     // Seçim değişince takip et
-     eventBus.on('selection.changed', (e) => {
-       currentElement = e.newSelection && e.newSelection[0] ? e.newSelection[0] : null;
-       // Panel yeniden çizildiği için küçük gecikmeyle deneyelim
-       setTimeout(enhanceAssigneeSelect, 50);
-     });
-
-     // Panelde "Assignee" girişini Select2'ye çevir
-     function enhanceAssigneeSelect() {
-       if (!currentElement || currentElement.type !== 'bpmn:UserTask') return;
-
-       const panel = document.getElementById('properties-panel');
-       if (!panel) return;
-
-       // Camunda provider'ın assignee entry’sini yakalamaya çalışalım (çeşitli sürümler için toleranslı seçiciler)
-       const entry = panel.querySelector('[data-entry-id="assignee"]')
-                  || panel.querySelector('.bio-properties-panel-entry[id*="assignee"]')
-                  || panel.querySelector('input[name="assignee"]')?.closest('.bio-properties-panel-entry');
-
-       if (!entry) return;
-       if (entry.dataset.enhanced === '1') return; // bir kez yap
-
-       const input = entry.querySelector('input');
-       if (!input) return;
-
-       entry.dataset.enhanced = '1';
-       input.style.display = 'none';
-
-       // Select elemanı ekle
-       const sel = document.createElement('select');
-       sel.id = 'assigneeSelect2';
-       sel.style.width = '100%';
-       input.after(sel);
-
-       // Select2 başlat
-       $(sel).select2({
-         placeholder: 'Kullanıcı seçin…',
-         allowClear: true,
-         ajax: {
-           url: '/FlowDesigner/Users',
-           dataType: 'json',
-           delay: 250,
-           data: (params) => ({ term: params.term || '' }),
-           processResults: (data) => ({ results: data })
-         },
-         // mevcut değeri gösterebilmek için minimumInputLength: 0
-         minimumInputLength: 0,
-         width: '100%'
-       });
-
-       // Mevcut değeri set et
-       const currentVal = input.value || currentElement.businessObject?.$attrs?.['camunda:assignee'] || '';
-       if (currentVal) {
-         const opt = new Option(String(currentVal), String(currentVal), true, true);
-         $(sel).append(opt).trigger('change');
-       }
-
-       // Değişince BPMN attribute güncelle
-       $(sel).on('change', function () {
-         const val = $(this).val() || '';
-         input.value = val; // panelin internal state’iyle tutarlı kalsın
-         modeling.updateProperties(currentElement, { 'camunda:assignee': val });
-       });
-     }
-
-     // Panel içerikleri asenkron değişebildiği için MutationObserver ile de tetikle
-     const obs = new MutationObserver(() => setTimeout(enhanceAssigneeSelect, 50));
-     obs.observe(document.getElementById('properties-panel'), { childList: true, subtree: true });
-
-     // İlk yüklemede de dene
-     setTimeout(enhanceAssigneeSelect, 200);
-</script>
