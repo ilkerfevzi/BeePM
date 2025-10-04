@@ -24,19 +24,27 @@
 @section Scripts {
 
     <!-- jQuery -> Select2 (SİRA ÖNEMLİ) -->
+    <!-- 1. jQuery -->
     <script src="~/lib/jquery/jquery.min.js"></script>
-    <link href="~/lib/select2/select2.min.css" rel="stylesheet" />
+
+    <!-- 2. Select2 -->
+    <link rel="stylesheet" href="~/lib/select2/select2.min.css" />
     <script src="~/lib/select2/select2.min.js"></script>
 
-    <!-- BPMN.io CSS -->
+    <!-- 3. BPMN -->
+    <script src="~/lib/bpmn/bpmn-js/bpmn-modeler.production.min.js"></script>
     <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/diagram-js.css" />
     <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/bpmn-font/css/bpmn.css" />
     <link rel="stylesheet" href="~/lib/bpmn/bpmn-js/assets/bpmn-js.css" />
+
+    <!-- 4. Properties Panel -->
+    <script src="~/lib/bpmn/bpmn-js-properties-panel/bpmn-js-properties-panel.umd.js"></script>
     <link rel="stylesheet" href="~/lib/bpmn/bpmn-js-properties-panel/assets/properties-panel.css" />
 
-    <!-- BPMN.io core & Properties Panel (UMD) -->
-    <script src="~/lib/bpmn/bpmn-js/bpmn-modeler.production.min.js"></script>
-    <script src="~/lib/bpmn/bpmn-js-properties-panel/bpmn-js-properties-panel.umd.js"></script>
+    <!-- 5. Custom Provider -->
+    <script src="~/lib/bpmn/custom/custom-props-provider.js" type="module"></script>
+
+    
 
     <script>
         // DB’den gelen BPMN XML (veya boş)
